@@ -23,7 +23,7 @@ const fakeFetch = async url => { const k = Object.keys(pages).find(k => url.incl
 (() => {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'pwm-')), f = path.join(d, 'input.txt');
   fs.writeFileSync(f, '# contoh\nfollowers: 12\n@Sari bikin warung dong\nbudi_a jembatan!\nrusak\n');
-  const env = { ...process.env, DATA_DIR: d, MANUAL_FILE: f, IG_TOKEN: '' };
+  const env = { ...process.env, DATA_DIR: d, MANUAL_FILE: f, FOLLOWERS_FILE: f + '.none', IG_TOKEN: '' };
   const out = execFileSync('node', [path.join(__dirname, 'daily.js')], { env }).toString();
   assert.ok(out.includes('Input manual: 12 followers, 2 komentar'), out);
   const w = JSON.parse(fs.readFileSync(path.join(d, 'world.json'), 'utf8'));

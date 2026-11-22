@@ -3,6 +3,7 @@
 const fs = require('fs'), path = require('path');
 const { step, newWorld, rng } = require('../engine/engine');
 const { fetchInput } = require('./ig');
+const FOLLOWERS = process.env.FOLLOWERS_FILE || path.join(__dirname, '..', 'manual', 'followers.txt');
 const MANUAL = process.env.MANUAL_FILE || path.join(__dirname, '..', 'manual', 'input.txt');
 
 const DATA = process.env.DATA_DIR || path.join(__dirname, '..', 'site', 'data');
@@ -44,9 +45,11 @@ function manualInput(world) {
   else if (process.env.IG_TOKEN) { input = await fetchInput({ token: process.env.IG_TOKEN, igUserId: process.env.IG_USER_ID, seen: new Set(cursor.seen) }); source = 'Instagram'; }
   else { input = manualInput(world); source = 'Input manual'; }
   if (!input) { console.log('Tidak ada IG_TOKEN dan manual/input.txt kosong, dilewati.'); return; }
+  try { input.followerNames = fs.readFileSync(FOLLOWERS, 'utf8').split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#')); } catch { input.followerNames = []; }
+  if (input.followerNames.length) input.followers = Math.max(input.followers, input.followerNames.length + 1);
   console.log(`${source}: ${input.followers} followers, ${input.comments.length} komentar baru`);
 
-  const out = step(world, { followers: input.followers, comments: input.comments });
+  const out = step(world, { followers: input.followers, comments: input.comments, followerNames: input.followerNames });
   if (args.includes('--dry')) { console.log(JSON.stringify(out.log.stats)); return; }
 
   const days = read('days.json', []); days.push(out.log);

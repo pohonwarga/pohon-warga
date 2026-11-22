@@ -3,7 +3,7 @@
 const CFG = {
   rtCapacity: 300, houseCap: 8, startEnergy: 100,
   stages: [[0, 30], [31, 100], [101, 200], [201, 300]], // stage 1..4 by RT population
-  cost: { rumah: 4, warung: 6, balai: 8, sumur: 5, menara: 10, kebun: 4, jembatan: 6, lampion: 3 },
+  cost: { rumah: 4, warung: 6, balai: 8, sumur: 5, menara: 10, kebun: 4, jembatan: 6, lampion: 3, mercusuar: 8 },
   buildDays: { rumah: 1, warung: 2, balai: 3, sumur: 2, menara: 3, kebun: 1, jembatan: 2, lampion: 1 },
   buildKeys: { rumah: ['rumah', 'tinggal'], warung: ['warung', 'makan'], balai: ['balai', 'kumpul'], sumur: ['sumur', 'air'],
     menara: ['menara'], mercusuar: ['mercusuar'], kebun: ['kebun', 'taman'], jembatan: ['jembatan'], lampion: ['lampu', 'lampion'] },
@@ -150,6 +150,13 @@ function step(prev, input) {
   for (const [key, cs] of Object.entries(byUser)) { const r = S.residents[key]; if (!r || r.optOut || r.id === 'budi') continue;
     r.koin = (r.koin || 0) + 1; if (q.check(cs)) { r.koin += 1; qDone++; qNames.push(r.username); } }
   log.quest = { id: q.id, text: q.text, selesai: qDone, nama: qNames.slice(0, 3) }; S.questNext = questFor(S.worldId, S.day + 1).text; S.questLast = { text: q.text, selesai: qDone, nama: qNames.slice(0, 3) }; log.questBesok = questFor(S.worldId, S.day + 1).text;
+  // 1c. follower bernama (daftar dari manual/followers.txt): tiap nama jadi warga
+  for (const nm of (input.followerNames || [])) {
+    const key = String(nm).replace(/^@/, '').trim().toLowerCase(); if (!key || key === 'budi') continue;
+    const ex = S.residents[key]; if (ex && !ex.optOut) continue; if (ex && ex.optOut) continue;
+    S.residents[key] = { id: key, username: cleanName(key), rt: null, house: null, task: 'CARI', energy: CFG.startEnergy, joinedDay: S.day, optOut: false, job: randomJob(key, S.worldId), exp: 0, level: 1, jobChangedDay: -99 };
+    log.events.push({ type: 'join', user: S.residents[key].username });
+  }
   // 2. population & RT assignment
   S.population = Math.max(input.followers, named().length);
   let left = S.population;
@@ -186,12 +193,18 @@ function step(prev, input) {
   S.pools.food = Math.round((S.pools.food - S.population * 0.5) * 10) / 10;
   if (S.pools.food < 0) { S.pools.food = 0; for (const r of named()) r.energy = clamp(r.energy - 10, 0, 100); log.events.push({ type: 'paceklik' }); }
 
+  // 3c. satu rumah per warga bernama (rumah berlabel nama)
+  for (const r of named()) if (!r.house && r.id !== 'budi') {
+    const id = 'b' + S.buildings.length;
+    S.buildings.push({ id, type: 'rumah', rt: r.rt, status: 'done', damage: 0, by: r.id, byName: r.username, comment: null, day: S.day }); r.house = id;
+    log.events.push({ type: 'house_for', user: r.username });
+  }
   // 4. houses (auto) + building queue
   for (const rt of S.rts) {
     if (!S.buildings.some(x => x.rt === rt.id && x.type === 'balai')) S.buildings.push({ id: 'b' + S.buildings.length, type: 'balai', rt: rt.id, status: 'done', damage: 0, by: null, comment: null, day: S.day });
     const homes = S.buildings.filter(x => x.rt === rt.id && x.type === 'rumah' && x.status === 'done').length;
     const inRt = named().filter(r => r.rt === rt.id).length;
-    if (inRt > homes * CFG.houseCap || homes < Math.min(6, Math.ceil(rt.pop / 40))) { S.buildings.push({ id: 'b' + S.buildings.length, type: 'rumah', rt: rt.id, status: 'done', damage: 0, by: null, comment: null, day: S.day }); log.events.push({ type: 'auto_house', rt: rt.id }); }
+    if (homes < Math.min(6, Math.ceil(rt.pop / 40))) { S.buildings.push({ id: 'b' + S.buildings.length, type: 'rumah', rt: rt.id, status: 'done', damage: 0, by: null, comment: null, day: S.day }); log.events.push({ type: 'auto_house', rt: rt.id }); }
   }
   if (S.kas >= CFG.belanjaBesar && !S.queue.some(q => q.budi) && !S.buildings.some(b => b.status === 'building' && b.by === 'budi')) {
     const t = ['sumur', 'menara', 'kebun', 'jembatan'][Math.floor(rand() * 4)];

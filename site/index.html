@@ -171,11 +171,22 @@ for(const b of builds){
 
 const PRE=16,VAC=8;
 const vacant=order.slice(oi,oi+Math.max(PRE-builds.length,VAC)).map(s=>{const h=houseFor(s.sector,true);h.position.set(s.x,0,s.z);h.rotation.y=s.ry;S.add(h);return{s,h}});
+// ---------- apartemen warga (tampil jika ?apt=1 atau world.apartemen > 0) ----------
+const APT_N=Math.min(4,Q.get('apt')?(+Q.get('apt')||4):(DATA.apartemen||0));
+const APT_AT=[[16,26],[26,26],[16,38],[26,38]];
+if(APT_N>0){try{
+ const ag=(await GL.loadAsync('v5/apartemen_warga.glb')).scene;
+ const bx=new THREE.Box3().setFromObject(ag),sz=bx.getSize(new THREE.Vector3()),ct=bx.getCenter(new THREE.Vector3());
+ const k=9/Math.max(sz.x,sz.z);
+ for(let i=0;i<APT_N;i++){const a=ag.clone(true);a.traverse(m=>{if(m.isMesh){m.castShadow=true;m.receiveShadow=true}});
+  const w=new THREE.Group();a.position.set(-ct.x,-bx.min.y,-ct.z);w.add(a);w.scale.setScalar(k);
+  w.position.set(APT_AT[i][0],0,APT_AT[i][1]);S.add(w)}
+}catch(e){console.warn('apartemen gagal dimuat',e)}}
 const tmp=new THREE.Vector3();
 // ---------- dunia kecil: penduduk, Budi, hewan (jalan + tabrakan sederhana) ----------
 const OB=[];
 try{(await (await fetch('v5/pw_obst.json')).json()).forEach(o=>OB.push([o[0],o[1],o[2]]))}catch(e){}
-OB.push([0,0,7.8],[1.2,-29,6.8]);slots.forEach(s=>OB.push([s.x,s.z,3.9]));
+OB.push([0,0,7.8],[1.2,-29,6.8]);for(let i=0;i<APT_N;i++)OB.push([APT_AT[i][0],APT_AT[i][1],6]);slots.forEach(s=>OB.push([s.x,s.z,3.9]));
 const AG=[];const wrapA=a=>{while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a};
 const rr=(a,b)=>a+Math.random()*(b-a);
 const BOX=(w,h,d,c,x,y,z,p)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),MT(c));m.position.set(x,y,z);m.castShadow=true;p.add(m);return m};

@@ -12,6 +12,9 @@ const FILE = path.join(DATA, 'replied.json');
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry');
 const MAX = parseInt((args[args.indexOf('--max') + 1]) || '30', 10) || 30;
+// Batas balasan per hari (tanggal WIB). Bisa diubah lewat env DAILY_REPLY_MAX.
+const DAILY_MAX = parseInt(process.env.DAILY_REPLY_MAX || '30', 10) || 30;
+const todayWIB = () => new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const hashStr = s => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
 
@@ -105,7 +108,11 @@ async function main() {
   const token = process.env.IG_TOKEN, uid = process.env.IG_USER_ID;
   if (!token || !uid) throw new Error('IG_TOKEN / IG_USER_ID belum diisi');
   fs.mkdirSync(DATA, { recursive: true });
-  const done = new Set(readJson(FILE, { ids: [] }).ids);
+  const state = readJson(FILE, { ids: [] });
+  const done = new Set(state.ids);
+  const today = todayWIB();
+  let countToday = state.day === today ? (state.count || 0) : 0;
+  const quota = Math.max(0, DAILY_MAX - countToday);
   const me = (await call('GET', `/${uid}`, { fields: 'username' })).username;
   const media = await call('GET', `/${uid}/media`, { fields: 'id', limit: 12 });
   const todo = [];
@@ -124,14 +131,14 @@ async function main() {
     }
   }
   todo.sort((a, b) => (Date.parse(a.timestamp) || 0) - (Date.parse(b.timestamp) || 0));
-  console.log(`${todo.length} komentar belum dibalas (akan diproses maksimal ${MAX}).${DRY ? ' MODE DRY: tidak mengirim apa pun.' : ''}`);
+  console.log(`${todo.length} komentar belum dibalas (akan diproses maksimal ${Math.min(MAX, quota)}, sisa kuota hari ini ${quota}/${DAILY_MAX}).${DRY ? ' MODE DRY: tidak mengirim apa pun.' : ''}`);
   let sent = 0;
-  for (const c of todo.slice(0, MAX)) {
+  for (const c of todo.slice(0, Math.min(MAX, quota))) {
     const msg = pickReply(c);
     if (DRY) { console.log(`- @${c.username}: "${c.text}"\n    -> ${msg}`); continue; }
     try {
       await call('POST', `/${c.id}/replies`, { message: msg });
-      done.add(c.id); sent++;
+      done.add(c.id); sent++; countToday++;
       console.log(`Dibalas @${c.username}`);
     } catch (e) {
       console.log(`Gagal membalas @${c.username}: ${e.message}`);
@@ -140,7 +147,7 @@ async function main() {
     }
     await sleep(4000);
   }
-  if (!DRY) fs.writeFileSync(FILE, JSON.stringify({ ids: [...done].slice(-5000) }));
+  if (!DRY) fs.writeFileSync(FILE, JSON.stringify({ ids: [...done].slice(-5000), day: today, count: countToday }));
   console.log(`Selesai. Terkirim: ${sent}.`);
 }
 

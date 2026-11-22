@@ -152,7 +152,7 @@ const ODDS=slots.reduce((b,s)=>Math.hypot(s.x-20.86,s.z+14.22)<Math.hypot(b.x-20
 {const gm=[];desa.traverse(o=>{if(o.isMesh&&o.material&&/^v5_grass2?_t$/.test(o.material.name)&&!gm.includes(o.material))gm.push(o.material)});
  if(gm.length>1){const avg=new THREE.Color(0,0,0);gm.forEach(m=>avg.add(m.color));avg.multiplyScalar(1/gm.length);gm.forEach(m=>m.color.lerp(avg,.45))}}
 const BEAMS=[];
-function lighthouse(){const h=msc.scene.clone(true);h.scale.setScalar(1.3);
+function lighthouse(){const h=msc.scene.clone(true);h.scale.setScalar(2.4);
  h.traverse(m=>{if(!m.isMesh)return;m.castShadow=true;m.receiveShadow=true;
   if(m.name==='Sinar'||(m.parent&&m.parent.name==='Sinar')){m.material=m.material.clone();Object.assign(m.material,{transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false});m.castShadow=false;BEAMS.push(m)}});
  return h}
@@ -160,9 +160,10 @@ const builds=(DATA.buildings||[]).filter(b=>b.type!=='balai'&&(b.status==='done'
 const order=slots.filter(s=>s!==ODDS);
 const placed=[];let oi=0;
 for(const b of builds){
- const s=(b.id==='b1')?ODDS:order[oi++];if(!s)break;
+ const LH=b.type==='mercusuar'&&msc;
+ const s=LH?{x:54.5,z:13,ry:Math.PI,sector:'hijau',id:'lh'}:(b.id==='b1')?ODDS:order[oi++];if(!s)break;
  const h=(b.type==='mercusuar'&&msc)?lighthouse():houseFor(s.sector);h.position.set(s.x,0,s.z);h.rotation.y=s.ry;
- if(b.status==='building'){h.scale.setScalar(.75);h.traverse(m=>{if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=.6}})}
+ if(b.status==='building'){h.scale.multiplyScalar(.75);h.traverse(m=>{if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=.6}})}
  S.add(h);
  const user=LBL[b.id]||(b.by&&DATA.residents&&DATA.residents[b.by]?DATA.residents[b.by].username.replace(/^@/,''):null);
  placed.push({b,s,h,user:user||('rumah '+b.id),cls:SECT[s.sector].cls});

@@ -116,10 +116,13 @@ function step(prev, input) {
 
   // 1. comments (only those before the gate are passed in by the caller)
   const requests = [], byUser = {};
+  const followerSet = (input.followerNames && input.followerNames.length) ? new Set(input.followerNames.map(n => String(n).replace(/^@/, '').trim().toLowerCase())) : null;
   for (const c of input.comments) {
     const key = c.user.toLowerCase();
     if (key === 'pohonwarga' || String(c.username || '').toLowerCase() === 'pohonwarga') continue; // abaikan komentar akun sendiri
     if (hasKey(c.text, ['keluar'])) { if (S.residents[key]) { S.residents[key].optOut = true; log.events.push({ type: 'opt_out', user: cleanName(c.user) }); } continue; }
+    // Kalau daftar follower tersedia: hanya yang ada di daftar (atau sudah jadi warga) yang dihitung. Komentar non-follower dilewati sampai mereka follow.
+    if (followerSet && !followerSet.has(key) && !S.residents[key]) continue;
     let r = S.residents[key];
     if (!r || r.optOut) {
       r = S.residents[key] = { id: key, username: cleanName(c.user), rt: null, house: null, task: 'CARI', energy: CFG.startEnergy, joinedDay: S.day, optOut: false, job: randomJob(key, S.worldId), exp: 0, level: 1, jobChangedDay: -99 };
@@ -162,7 +165,7 @@ function step(prev, input) {
     log.events.push({ type: 'join', user: S.residents[key].username });
   }
   // 2. population & RT assignment
-  S.population = Math.max(input.followers, named().length);
+  S.population = followerSet ? named().filter(r => r.id !== 'budi').length : Math.max(input.followers, named().length);
   let left = S.population;
   for (const rt of S.rts) { rt.pop = Math.min(CFG.rtCapacity, left); left -= rt.pop; }
   const lastRt = S.rts[S.rts.length - 1];

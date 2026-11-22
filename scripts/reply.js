@@ -19,7 +19,7 @@ const hashStr = s => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.c
 const NAMA = { rumah: 'rumah', warung: 'warung', balai: 'balai warga', sumur: 'sumur', menara: 'menara', kebun: 'kebun', jembatan: 'jembatan', lampion: 'lampion' };
 
 // Beberapa pilihan emoji per jenis (dipilih acak-deterministik dari id komentar).
-const EMO_BUILD = { rumah: ['🏠', '🏡', '🧱'], warung: ['🍜', '🍛', '🥘'], balai: ['🏛️', '🤝', '📣'], sumur: ['💧', '🪣', '🌊'], menara: ['🗼', '🏗️', '🔭'], kebun: ['🌷', '🌳', '🌻'], jembatan: ['🌉', '🪵', '🚶'], lampion: ['🏮', '✨', '💡'] };
+const EMO_BUILD = { rumah: ['🏠', '🏡', '🧱'], warung: ['🍜', '🍛', '🥘'], balai: ['🏛️', '🤝', '📣'], sumur: ['💧', '🪣', '🌊'], menara: ['🗼', '🏗️', '🔭'], kebun: ['🌷', '🌳', '🌻'], jembatan: ['🌉', '🪵', '🚶'], lampion: ['🏮', '✨', '💡'], mercusuar: ['🗼', '🌊', '⛵'] };
 // Permintaan lain, dicocokkan dari kata di komentar (yang pertama cocok dipakai).
 const EMO_WORDS = [
   [/gereja|katedral/i, ['⛪', '🙏', '🕊️']], [/masjid|musala|musholla|surau/i, ['🕌', '🤲', '🌙']], [/pura/i, ['🛕', '🙏']], [/vihara|klenteng/i, ['🏯', '🙏']], [/ibadah/i, ['🙏', '🕊️']],

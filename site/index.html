@@ -125,9 +125,10 @@ function setMode(m){
 
 // ---------- muat aset ----------
 const GL=new GLTFLoader();
-const [stat,rumah,wargaG,slots,DATA]=await Promise.all([
+const [stat,rumah,wargaG,slots,DATA,msc]=await Promise.all([
  GL.loadAsync('v5/pw_desa_static.glb'),GL.loadAsync('v5/pw_rumah.glb'),GL.loadAsync('v5/pw_warga.glb'),
- fetch('v5/pw_slots.json').then(r=>r.json()),fetch('data/world.json').then(r=>r.json())
+ fetch('v5/pw_slots.json').then(r=>r.json()),fetch('data/world.json').then(r=>r.json()),
+ GL.loadAsync('v5/mercusuar.glb').catch(()=>null)
 ]);
 let LBL={};try{LBL=await (await fetch('v5/labels.json')).json()}catch(e){}
 let DAYS=[];try{DAYS=await (await fetch('data/days.json')).json()}catch(e){}
@@ -150,12 +151,17 @@ function houseFor(sector,neutral){
 const ODDS=slots.reduce((b,s)=>Math.hypot(s.x-20.86,s.z+14.22)<Math.hypot(b.x-20.86,b.z+14.22)?s:b,slots[0]);
 {const gm=[];desa.traverse(o=>{if(o.isMesh&&o.material&&/^v5_grass2?_t$/.test(o.material.name)&&!gm.includes(o.material))gm.push(o.material)});
  if(gm.length>1){const avg=new THREE.Color(0,0,0);gm.forEach(m=>avg.add(m.color));avg.multiplyScalar(1/gm.length);gm.forEach(m=>m.color.lerp(avg,.45))}}
+const BEAMS=[];
+function lighthouse(){const h=msc.scene.clone(true);h.scale.setScalar(1.3);
+ h.traverse(m=>{if(!m.isMesh)return;m.castShadow=true;m.receiveShadow=true;
+  if(m.name==='Sinar'||(m.parent&&m.parent.name==='Sinar')){m.material=m.material.clone();Object.assign(m.material,{transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false});m.castShadow=false;BEAMS.push(m)}});
+ return h}
 const builds=(DATA.buildings||[]).filter(b=>b.type!=='balai'&&(b.status==='done'||b.status==='building'));
 const order=slots.filter(s=>s!==ODDS);
 const placed=[];let oi=0;
 for(const b of builds){
  const s=(b.id==='b1')?ODDS:order[oi++];if(!s)break;
- const h=houseFor(s.sector);h.position.set(s.x,0,s.z);h.rotation.y=s.ry;
+ const h=(b.type==='mercusuar'&&msc)?lighthouse():houseFor(s.sector);h.position.set(s.x,0,s.z);h.rotation.y=s.ry;
  if(b.status==='building'){h.scale.setScalar(.75);h.traverse(m=>{if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=.6}})}
  S.add(h);
  const user=LBL[b.id]||(b.by&&DATA.residents&&DATA.residents[b.by]?DATA.residents[b.by].username.replace(/^@/,''):null);
@@ -356,6 +362,7 @@ window.__houses=placed.map(p=>({id:p.b.id,user:p.user,sector:p.s.sector,x:p.s.x,
 
 document.getElementById('load').style.opacity=0;setTimeout(()=>document.getElementById('load').remove(),600);
 function loop(){requestAnimationFrame(loop);
+ {const t=performance.now()/1000,L=LOOK[MODE]||LOOK.siang;BEAMS.forEach(m=>{m.rotation.y=t*1.6;m.material.opacity=.12+Math.min(1,L.lamp)*.38})}
  if(fly){const k=Math.min(1,Math.max(0,(performance.now()-fly.t0)/(fly.d||1100))),e=k*k*(3-2*k);controls.target.lerpVectors(fly.a,fly.b,e);cam.position.lerpVectors(fly.pa,fly.pb,e);if(k>=1){fly=null;if(!PL)controls.minDistance=18}}
  {const n=performance.now();simUpdate((n-(window.__lt||n))/1000);window.__lt=n}followPlayer();controls.update();R.render(S,cam);updLabels()}
 loop();

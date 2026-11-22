@@ -6,7 +6,7 @@ const CFG = {
   cost: { rumah: 4, warung: 6, balai: 8, sumur: 5, menara: 10, kebun: 4, jembatan: 6, lampion: 3 },
   buildDays: { rumah: 1, warung: 2, balai: 3, sumur: 2, menara: 3, kebun: 1, jembatan: 2, lampion: 1 },
   buildKeys: { rumah: ['rumah', 'tinggal'], warung: ['warung', 'makan'], balai: ['balai', 'kumpul'], sumur: ['sumur', 'air'],
-    menara: ['menara'], kebun: ['kebun', 'taman'], jembatan: ['jembatan'], lampion: ['lampu', 'lampion'] },
+    menara: ['menara'], mercusuar: ['mercusuar'], kebun: ['kebun', 'taman'], jembatan: ['jembatan'], lampion: ['lampu', 'lampion'] },
   taskKeys: { RONDA: ['ronda', 'jaga', 'siaga'], MASAK: ['masak', 'dapur'], CARI: ['cari', 'kayu'], PERBAIKI: ['perbaiki', 'tukang'], RAWAT: ['rawat', 'siram'], TIDUR: ['tidur', 'istirahat'], KERJA: ['kerja', 'bangun', 'proyek'] },
   energyCost: { RONDA: 15, MASAK: 10, CARI: 12, PERBAIKI: 12, RAWAT: 10, TIDUR: -40, KERJA: 12 },
   banned: ['anjing', 'bangsat', 'kontol', 'memek', 'babi', 'jancok', 'jancuk', 'bajingan', 'keparat', 'sialan', 'kampret', 'brengsek', 'goblok', 'tolol', 'ngentot', 'lonte', 'pantek', 'bokep', 'togel', 'pinjol', 'porno', 'kimak', 'cukimai', 'pepek', 'bangke', 'idiot'],
@@ -14,10 +14,11 @@ const CFG = {
   startKas: 30, kasPerActive: 0.2, belanjaBesar: 200,
   project: { rumah: { stages: 1, days: 1, need: 1, biaya: 1 }, warung: { stages: 1, days: 2, need: 2, biaya: 3 }, balai: { stages: 2, days: 2, need: 3, biaya: 4 },
     sumur: { stages: 1, days: 2, need: 2, biaya: 3 }, menara: { stages: 3, days: 2, need: 3, biaya: 5 }, kebun: { stages: 1, days: 1, need: 1, biaya: 2 },
-    jembatan: { stages: 3, days: 2, need: 3, biaya: 5 }, lampion: { stages: 1, days: 1, need: 1, biaya: 1 } },
+    jembatan: { stages: 3, days: 2, need: 3, biaya: 5 }, lampion: { stages: 1, days: 1, need: 1, biaya: 1 },
+    mercusuar: { stages: 2, days: 2, need: 2, biaya: 4 } },
   effects: { rumah: { kas: 2, line: 'Rumah baru berdiri, warga makin betah.' }, warung: { food: 10, wood: -2, line: 'Warung buka, kayu habis jadi meja.' },
     balai: { kas: 5, line: 'Balai ramai, rapat tak pernah selesai.' }, sumur: { food: 8, line: 'Air bersih mengalir, kebun makin subur.' },
-    menara: { line: 'Menara tinggi, penjaga betah begadang.' }, kebun: { food: 6, line: 'Kebun bunga mekar, lebah ikut pindah.' },
+    menara: { line: 'Menara tinggi, penjaga betah begadang.' }, mercusuar: { line: 'Cahayanya terlihat sampai ke tepi sungai.' }, kebun: { food: 6, line: 'Kebun bunga mekar, lebah ikut pindah.' },
     jembatan: { kas: 3, line: 'Warga tak perlu berenang lagi.' }, lampion: { kas: 1, line: 'Malam terang, anak-anak susah disuruh tidur.' } },
   // v0.4 (spesifikasi bagian 11, 13): job acak, EXP, level. 3 job; ganti job 1x seminggu lewat komen 'JOB <nama>'.
   jobs: ['ARCHER', 'SWORDMAN', 'MAGE'], expPerComment: 10, expMaxPerDay: 3, expPerLevel: 50, jobChangeDays: 7,
@@ -42,7 +43,7 @@ const CFG = {
     { id: 'jubah', nama: 'Jubah', harga: 8, slot: 'cape', keys: ['jubah'], look: { cape: 0x3a78d0 } },
     { id: 'sayap', nama: 'Sayap hitam kecil', harga: 8, slot: 'wings', keys: ['sayap'], look: { wings: 0x15121c } },
   ],
-  nama: { rumah: 'Rumah', warung: 'Warung', balai: 'Balai', sumur: 'Sumur', menara: 'Menara', kebun: 'Kebun', jembatan: 'Jembatan', lampion: 'Lampion' },
+  nama: { rumah: 'Rumah', warung: 'Warung', balai: 'Balai', sumur: 'Sumur', menara: 'Menara', kebun: 'Kebun', jembatan: 'Jembatan', lampion: 'Lampion', mercusuar: 'Mercusuar' },
 };
 function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 function rng(seedStr) { let a = hash(seedStr); return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }

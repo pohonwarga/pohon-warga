@@ -1,0 +1,35 @@
+name: Balas komentar Pohon Warga
+on:
+  schedule:
+    - cron: '*/20 * * * *'   # tiap ~20 menit (GitHub bisa terlambat); hanya jalan kalau variabel AUTO_REPLY = 1
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: 'Tes saja (cetak balasan yang akan dikirim, TIDAK mengirim)'
+        type: boolean
+        default: true
+permissions:
+  contents: write
+concurrency: pohon-warga-daily
+jobs:
+  reply:
+    # Jadwal otomatis hanya jalan kalau AUTO_REPLY = 1. Tombol manual selalu boleh.
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.AUTO_REPLY == '1' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Balas komentar
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: node scripts/reply.js ${{ (github.event_name == 'workflow_dispatch' && inputs.dry) && '--dry' || '' }}
+      - name: Simpan catatan balasan
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry) }}
+        run: |
+          git config user.name "pohon-warga-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add site/data/replied.json
+          git diff --cached --quiet || (git commit -m "Catatan balasan komentar" && git pull --rebase -q && git push)

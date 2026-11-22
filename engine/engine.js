@@ -246,4 +246,4 @@ function step(prev, input) {
   log.caption = caption(S, prev, log);
   S.log = undefined; return { state: S, log };
 }
-module.exports = { step, newWorld, CFG, rng, hash };
+module.exports = { step, newWorld, CFG, rng, hash, parseBuild };

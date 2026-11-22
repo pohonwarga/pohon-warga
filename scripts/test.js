@@ -59,7 +59,7 @@ const fakeFetch = async url => { const k = Object.keys(pages).find(k => url.incl
   assert.strictEqual(w.residents.dedi.say.text, '...', 'komen kasar disamarkan di balon');
   assert.ok(r.log.events.length >= 0 && r.state.residents.sari.say.text.length <= 48);
   const caption = require('../engine/engine.js'); // caption dipanggil di step
-  assert.ok(String(r.log.caption || '').includes('QUEST HARI INI'), 'caption memuat quest hari ini');
+  assert.ok(!/QUEST|koin|KELUAR/i.test(String(r.log.caption || '')) && /Komen = minta bangunan/.test(r.log.caption), 'caption tanpa quest/koin/KELUAR, ada CTA');
   console.log('quest/koin/balon OK: quest harian, 1-2 koin per hari, komen kasar disamarkan');
 })();
 // Uji toko kosmetik
@@ -73,7 +73,7 @@ const fakeFetch = async url => { const k = Object.keys(pages).find(k => url.incl
   for (let i = 0; i < 3; i++) w = step(w, { followers: 2, comments: [c('sari', 'halo', 10 + i)] }).state; // 4 koin
   let r = step(w, { followers: 2, comments: [c('sari', 'beli syal', 20)] }); w = r.state;
   assert.deepStrictEqual(w.residents.sari.items, ['syal']); assert.ok(w.residents.sari.look.scarf, 'item langsung dipakai');
-  assert.ok(String(r.log.caption).includes('Belanja'), 'caption memuat belanja');
+  assert.ok(!String(r.log.caption).includes('Belanja'), 'caption tidak memuat belanja');
   const k = w.residents.sari.koin; w = step(w, { followers: 2, comments: [c('sari', 'beli syal', 21)] }).state;
   assert.strictEqual(w.residents.sari.items.length, 1, 'tidak bisa beli dua kali');
   w.residents.sari.koin = 20; w = step(w, { followers: 2, comments: [c('sari', 'beli kacamata', 30)] }).state;

@@ -73,21 +73,32 @@ function caption(S, prev, log) {
   const homes = s => s.buildings.filter(b => b.type === 'rumah' && b.status === 'done').length;
   const built = log.events.filter(e => e.type === 'built');
   const workers = Object.values(S.residents).filter(r => r.task === 'KERJA' && !r.optOut && r.id !== 'budi').map(r => '@' + r.username).sort().slice(0, 3);
-  const L = [`Day ${S.day} Pohon Warga.`, `QUEST HARI INI (komen sebelum 19:00 WIB): ${log.questBesok}. Hadiah 1 koin.`];
-  L.push(log.usul_teratas ? `Usul teratas: @${log.usul_teratas.user}, "${log.usul_teratas.text}".` : 'Usul teratas: belum ada, Pak RT menunggu komentar.');
-  L.push(built.length ? 'Selesai: ' + built.map(e => `${CFG.nama[e.building]}. ${e.effect || ''}`.trim()).join(' ') : 'Selesai: belum ada.');
-  if (log.proyek.length) L.push('Dikerjakan: ' + log.proyek.map(p => `${CFG.nama[p.building]} tahap ${p.tahap} dari ${p.total}`).join(', ') + '.');
-  if (workers.length) L.push('Pekerja: ' + workers.join(', ') + '.');
-  const ups = log.events.filter(e => e.type === 'level_up').slice(0, 3);
-  if (ups.length) L.push('Naik level: ' + ups.map(e => `@${e.user} Lv${e.level}`).join(', ') + '.');
-  const bl = log.events.filter(e => e.type === 'beli').slice(0, 3);
-  if (bl.length) L.push('Belanja: ' + bl.map(e => `@${e.user} beli ${e.item}`).join(', ') + '.');
-  const jc = log.events.filter(e => e.type === 'job_change').slice(0, 3);
-  if (jc.length) L.push('Ganti job: ' + jc.map(e => `@${e.user} jadi ${e.to}`).join(', ') + '.');
-  L.push(`Warga: ${prev.population} menjadi ${S.population}. Rumah: ${homes(prev)} menjadi ${homes(S)}.`);
-  L.push(`Kas: ${S.kas} koin` + (S.kas < 0 ? ` (utang: ${-S.kas})` : '') + '.');
-  L.push(`Quest kemarin: ${log.quest.text}. Selesai: ${log.quest.selesai} warga` + (log.quest.nama.length ? ' (' + log.quest.nama.map(n => '@' + n).join(', ') + ')' : '') + '.');
-  L.push('Besok: ' + (S.queue[0] ? CFG.nama[S.queue[0].type] + ' dari antrean.' : 'menunggu usul baru.'));
+  const pick = (k, list) => list[hash(S.worldId + '|cap|' + k + '|' + S.day) % list.length];
+  const EMO = { rumah: '🏠', warung: '🍜', balai: '🏛️', sumur: '💧', menara: '🗼', kebun: '🌷', jembatan: '🌉', lampion: '🏮' };
+  const clean = t => { const x = String(t || '').replace(/\s+/g, ' ').trim().slice(0, 60); return CFG.banned.some(w => x.toLowerCase().includes(w)) ? '...' : x; };
+  const top = log.usul_teratas, L = [];
+  // hook
+  if (top) L.push(pick('hook', [`Aku baca semua komentar kalian. Usul terpopuler hari ini: ${clean(top.text)} ${EMO[top.building] || ''}`.trim(), `Hari ini kalian ramai juga ya. Aku catat dulu semuanya 😅`, `Mayor Budi lapor: ada usulan baru, dan aku sudah baca semuanya 👀`]));
+  else L.push(pick('sepi', ['Hari ini belum ada yang usul. Mayor Budi bengong 🥲 Mau bangun apa?', 'Sepi banget hari ini. Aku sendirian di balai 🥲 Kasih usul dong!']));
+  L.push('');
+  L.push(`📍 Day ${S.day} di Pohon Warga`);
+  if (top) {
+    const nx0 = S.queue[0], next = nx0 && nx0.user === top.user && nx0.type === top.building;
+    const like = top.likes > 0 ? `${top.likes} like, paling banyak hari ini` : 'usul pertama hari ini';
+    L.push(`🗳️ Usul terpopuler dari @${top.user}: "${clean(top.text)}" ${EMO[top.building] || ''} (${like}${next ? ', jadi dibangun besok' : ', masuk antrean'})`.replace(/ +/g, ' ').trim());
+  }
+  if (built.length) L.push(...built.map(e => `${EMO[e.building] || '✅'} ${CFG.nama[e.building]} sudah jadi. ${(e.effect || (CFG.effects[e.building] || {}).line || '')}`.trim()));
+  if (log.proyek.length) L.push('🔨 Lagi dikerjakan: ' + log.proyek.map(p => CFG.nama[p.building] + (p.total > 1 ? ` (tahap ${p.tahap} dari ${p.total})` : '')).join(', ') + (workers.length ? ' oleh ' + workers.join(', ') : ''));
+  if (S.population !== prev.population) L.push(`👥 Warga: ${prev.population} → ${S.population} (${S.population > prev.population ? pick('naik', ['makasih yang baru gabung!', 'selamat datang di desa!', 'desa makin ramai!']) : 'ada yang pindah'})`);
+  else L.push(`👥 Warga: ${S.population}`);
+  if (homes(S) !== homes(prev)) L.push(`🏠 Rumah: ${homes(prev)} → ${homes(S)}`);
+  L.push('');
+  const nx = S.queue[0];
+  L.push(nx ? `Besok aku bangun ${CFG.nama[nx.type].toLowerCase()} ${EMO[nx.type] || ''}`.trim() : pick('besok', ['Besok bangun apa ya? Kalian yang tentukan 👇', 'Besok masih kosong. Isi dulu lewat komentar 👇']));
+  L.push('');
+  L.push(pick('cta', ['Follow = jadi warga 🏡', 'Follow dulu biar kebagian rumah 🏡', 'Follow = otomatis jadi warga desa 🏡']));
+  L.push('Komen = minta bangunan 💬');
+  L.push(pick('cta2', ['Ketik bangunan apa pun, aku baca satu-satu.', 'Usul yang paling banyak di-like dibangun duluan.']));
   return L.join('\n');
 }
 

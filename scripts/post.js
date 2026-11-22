@@ -24,7 +24,7 @@ function captionToday() {
   let log = {};
   try { const d = JSON.parse(fs.readFileSync(f, 'utf8')); log = d[d.length - 1] || {}; } catch {}
   const base = (log.caption || `Day ${log.day || ''} Pohon Warga.`).trim();
-  return `${base}\n\nFollow = jadi warga. Komen = minta bangunan.\nKetik KELUAR kalau tidak mau jadi warga.\n\n#pohonwarga #desaapung #lowpoly`;
+  return `${base}\n\n#pohonwarga #desaapung #lowpoly`;
 }
 
 (async () => {

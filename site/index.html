@@ -179,7 +179,7 @@ if(APT_N>0){try{
  const bx=new THREE.Box3().setFromObject(ag),sz=bx.getSize(new THREE.Vector3()),ct=bx.getCenter(new THREE.Vector3());
  const k=9/Math.max(sz.x,sz.z);
  for(let i=0;i<APT_N;i++){const a=ag.clone(true);a.traverse(m=>{if(m.isMesh){m.castShadow=true;m.receiveShadow=true}});
-  const w=new THREE.Group();a.position.set(-ct.x,-bx.min.y,-ct.z);w.add(a);w.scale.setScalar(k);
+  const w=new THREE.Group();a.position.set(-ct.x,-bx.min.y,-ct.z);w.add(a);w.scale.setScalar(k);w.rotation.y=Math.PI;
   w.position.set(APT_AT[i][0],0,APT_AT[i][1]);S.add(w)}
 }catch(e){console.warn('apartemen gagal dimuat',e)}}
 const tmp=new THREE.Vector3();

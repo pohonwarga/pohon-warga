@@ -3,9 +3,9 @@
 const CFG = {
   rtCapacity: 300, houseCap: 8, startEnergy: 100,
   stages: [[0, 30], [31, 100], [101, 200], [201, 300]], // stage 1..4 by RT population
-  cost: { rumah: 4, warung: 6, balai: 8, sumur: 5, menara: 10, kebun: 4, jembatan: 6, lampion: 3, mercusuar: 8 },
-  buildDays: { rumah: 1, warung: 2, balai: 3, sumur: 2, menara: 3, kebun: 1, jembatan: 2, lampion: 1 },
-  buildKeys: { rumah: ['rumah', 'tinggal'], warung: ['warung', 'makan'], balai: ['balai', 'kumpul'], sumur: ['sumur', 'air'],
+  cost: { rumah: 4, warung: 6, balai: 8, sumur: 5, menara: 10, kebun: 4, jembatan: 6, lampion: 3, mercusuar: 8, pasar: 6, masjid: 8, sekolah: 8, rumahsakit: 8, minimarket: 5 },
+  buildDays: { rumah: 1, warung: 2, balai: 3, sumur: 2, menara: 3, kebun: 1, jembatan: 2, lampion: 1, pasar: 2, masjid: 2, sekolah: 2, rumahsakit: 3, minimarket: 1 },
+  buildKeys: { rumahsakit: ['rumah sakit', 'rumahsakit', 'klinik'], pasar: ['pasar', 'market'], masjid: ['masjid', 'musholla', 'musala', 'gereja', 'pura', 'vihara', 'tempat ibadah'], sekolah: ['sekolah'], minimarket: ['minimarket', 'indomaret', 'alfamart', 'supermarket'], rumah: ['rumah', 'tinggal'], warung: ['warung', 'makan'], balai: ['balai', 'kumpul'], sumur: ['sumur', 'air'],
     menara: ['menara'], mercusuar: ['mercusuar'], kebun: ['kebun', 'taman'], jembatan: ['jembatan'], lampion: ['lampu', 'lampion'] },
   taskKeys: { RONDA: ['ronda', 'jaga', 'siaga'], MASAK: ['masak', 'dapur'], CARI: ['cari', 'kayu'], PERBAIKI: ['perbaiki', 'tukang'], RAWAT: ['rawat', 'siram'], TIDUR: ['tidur', 'istirahat'], KERJA: ['kerja', 'bangun', 'proyek'] },
   energyCost: { RONDA: 15, MASAK: 10, CARI: 12, PERBAIKI: 12, RAWAT: 10, TIDUR: -40, KERJA: 12 },
@@ -15,8 +15,10 @@ const CFG = {
   project: { rumah: { stages: 1, days: 1, need: 1, biaya: 1 }, warung: { stages: 1, days: 2, need: 2, biaya: 3 }, balai: { stages: 2, days: 2, need: 3, biaya: 4 },
     sumur: { stages: 1, days: 2, need: 2, biaya: 3 }, menara: { stages: 3, days: 2, need: 3, biaya: 5 }, kebun: { stages: 1, days: 1, need: 1, biaya: 2 },
     jembatan: { stages: 3, days: 2, need: 3, biaya: 5 }, lampion: { stages: 1, days: 1, need: 1, biaya: 1 },
-    mercusuar: { stages: 2, days: 2, need: 2, biaya: 4 } },
-  effects: { rumah: { kas: 2, line: 'Rumah baru berdiri, warga makin betah.' }, warung: { food: 10, wood: -2, line: 'Warung buka, kayu habis jadi meja.' },
+    mercusuar: { stages: 2, days: 2, need: 2, biaya: 4 },
+    pasar: { stages: 1, days: 2, need: 2, biaya: 3 }, masjid: { stages: 2, days: 2, need: 2, biaya: 4 }, sekolah: { stages: 2, days: 2, need: 2, biaya: 4 }, rumahsakit: { stages: 2, days: 3, need: 3, biaya: 5 }, minimarket: { stages: 1, days: 1, need: 1, biaya: 2 } },
+  effects: { pasar: { food: 8, kas: 3, line: 'Pasar buka, warga mulai berdagang.' }, masjid: { kas: 2, line: 'Tempat ibadah berdiri, warga berkumpul.' }, sekolah: { kas: 3, line: 'Sekolah dibuka, anak-anak mulai belajar.' }, rumahsakit: { food: 2, kas: 4, line: 'Rumah sakit siap merawat warga.' }, minimarket: { food: 3, kas: 1, line: 'Minimarket buka di pojok desa.' },
+    rumah: { kas: 2, line: 'Rumah baru berdiri, warga makin betah.' }, warung: { food: 10, wood: -2, line: 'Warung buka, kayu habis jadi meja.' },
     balai: { kas: 5, line: 'Balai ramai, rapat tak pernah selesai.' }, sumur: { food: 8, line: 'Air bersih mengalir, kebun makin subur.' },
     menara: { line: 'Menara tinggi, penjaga betah begadang.' }, mercusuar: { line: 'Cahayanya terlihat sampai ke tepi sungai.' }, kebun: { food: 6, line: 'Kebun bunga mekar, lebah ikut pindah.' },
     jembatan: { kas: 3, line: 'Warga tak perlu berenang lagi.' }, lampion: { kas: 1, line: 'Malam terang, anak-anak susah disuruh tidur.' } },
@@ -43,7 +45,7 @@ const CFG = {
     { id: 'jubah', nama: 'Jubah', harga: 8, slot: 'cape', keys: ['jubah'], look: { cape: 0x3a78d0 } },
     { id: 'sayap', nama: 'Sayap hitam kecil', harga: 8, slot: 'wings', keys: ['sayap'], look: { wings: 0x15121c } },
   ],
-  nama: { rumah: 'Rumah', warung: 'Warung', balai: 'Balai', sumur: 'Sumur', menara: 'Menara', kebun: 'Kebun', jembatan: 'Jembatan', lampion: 'Lampion', mercusuar: 'Mercusuar' },
+  nama: { rumahsakit: 'Rumah Sakit', pasar: 'Pasar', masjid: 'Tempat Ibadah', sekolah: 'Sekolah', minimarket: 'Minimarket', rumah: 'Rumah', warung: 'Warung', balai: 'Balai', sumur: 'Sumur', menara: 'Menara', kebun: 'Kebun', jembatan: 'Jembatan', lampion: 'Lampion', mercusuar: 'Mercusuar' },
 };
 function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 function rng(seedStr) { let a = hash(seedStr); return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -75,7 +77,7 @@ function caption(S, prev, log) {
   const built = log.events.filter(e => e.type === 'built');
   const workers = Object.values(S.residents).filter(r => r.task === 'KERJA' && !r.optOut && r.id !== 'budi').map(r => '@' + r.username).sort().slice(0, 3);
   const pick = (k, list) => list[hash(S.worldId + '|cap|' + k + '|' + S.day) % list.length];
-  const EMO = { rumah: '🏠', warung: '🍜', balai: '🏛️', sumur: '💧', menara: '🗼', kebun: '🌷', jembatan: '🌉', lampion: '🏮' };
+  const EMO = { rumahsakit: '🏥', pasar: '🛒', masjid: '🕌', sekolah: '🏫', minimarket: '🏪', rumah: '🏠', warung: '🍜', balai: '🏛️', sumur: '💧', menara: '🗼', kebun: '🌷', jembatan: '🌉', lampion: '🏮' };
   const clean = t => { const x = String(t || '').replace(/\s+/g, ' ').trim().slice(0, 60); return CFG.banned.some(w => x.toLowerCase().includes(w)) ? '...' : x; };
   const top = log.usul_teratas, L = [];
   // hook
@@ -115,6 +117,7 @@ function step(prev, input) {
   const requests = [], byUser = {};
   for (const c of input.comments) {
     const key = c.user.toLowerCase();
+    if (key === 'pohonwarga' || String(c.username || '').toLowerCase() === 'pohonwarga') continue; // abaikan komentar akun sendiri
     if (hasKey(c.text, ['keluar'])) { if (S.residents[key]) { S.residents[key].optOut = true; log.events.push({ type: 'opt_out', user: cleanName(c.user) }); } continue; }
     let r = S.residents[key];
     if (!r || r.optOut) {

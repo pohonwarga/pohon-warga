@@ -48,7 +48,7 @@ function manualInput(world) {
   else { input = manualInput(world); source = 'Input manual'; }
   if (!input) { console.log('Tidak ada IG_TOKEN dan manual/input.txt kosong, dilewati.'); return; }
   try { input.followerNames = fs.readFileSync(FOLLOWERS, 'utf8').split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#')); } catch { input.followerNames = []; }
-  if (input.followerNames.length) input.followers = Math.max(input.followers, input.followerNames.length + 1);
+  if (input.followerNames.length) input.followers = Math.max(input.followers, input.followerNames.length);
   console.log(`${source}: ${input.followers} followers, ${input.comments.length} komentar baru`);
 
   const out = step(world, { followers: input.followers, comments: input.comments, followerNames: input.followerNames });

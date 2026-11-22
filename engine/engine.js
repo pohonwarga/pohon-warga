@@ -165,7 +165,8 @@ function step(prev, input) {
     log.events.push({ type: 'join', user: S.residents[key].username });
   }
   // 2. population & RT assignment
-  S.population = followerSet ? named().filter(r => r.id !== 'budi').length : Math.max(input.followers, named().length);
+  // Jumlah warga = jumlah FOLLOWER (bukan yang komen). Dengan daftar nama: minimal sebanyak nama di daftar.
+  S.population = followerSet ? Math.max(input.followers || 0, named().filter(r => r.id !== 'budi').length) : Math.max(input.followers, named().length);
   let left = S.population;
   for (const rt of S.rts) { rt.pop = Math.min(CFG.rtCapacity, left); left -= rt.pop; }
   const lastRt = S.rts[S.rts.length - 1];

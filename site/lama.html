@@ -487,7 +487,7 @@ function renderRT(rtId){curRT=rtId;window.__desaCol=desaColor(rtId);for(const o 
  window.TGG=DYN;const bslot={};let si=0;
  const blS=[...bl.filter(b=>b.type!=='rumah'),...bl.filter(b=>b.type==='rumah').filter((x,i)=>i%5===0).slice(0,8)];const fronts=[];
  blS.forEach((b,i)=>{if(si*3>=slots.length)return;const sl=slots[si++*3];const ry=Math.atan2(-sl.x,-sl.z);
-  const g=b.type==='rumah'?house(i,sl.x,sl.z,ry):BUILD[b.type](sl.x,sl.z,ry);
+  const g=(b.type==='rumah'||!BUILD[b.type])?house(i,sl.x,sl.z,ry):BUILD[b.type](sl.x,sl.z,ry);
   if(b.status==='building')g.scale.y*=.5;const fr={x:sl.x+Math.sin(ry)*2.8,z:sl.z+Math.cos(ry)*2.8};fr.type=b.type;fr.status=b.status;fr.done=b.doneDay;fronts.push(fr);if(b.by)bslot[b.by]=fr});
  const props=['basket','lantern','hammer','wave','broom','none'];
  const topIds=new Set(rs.filter(x=>x.id!=='budi'&&(x.exp||0)>0).sort((a,b)=>(b.exp||0)-(a.exp||0)).slice(0,8).map(x=>x.id));

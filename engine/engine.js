@@ -95,6 +95,7 @@ function caption(S, prev, log) {
   if (S.population !== prev.population) L.push(`👥 Warga: ${prev.population} → ${S.population} (${S.population > prev.population ? pick('naik', ['makasih yang baru gabung!', 'selamat datang di desa!', 'desa makin ramai!']) : 'ada yang pindah'})`);
   else L.push(`👥 Warga: ${S.population}`);
   if (homes(S) !== homes(prev)) L.push(`🏠 Rumah: ${homes(prev)} → ${homes(S)}`);
+  if ((S.penghuniApt || 0) !== (prev.penghuniApt || 0)) L.push(`🏢 Apartemen: ${S.penghuniApt} warga tinggal di ${S.apartemen} gedung`);
   L.push('');
   const nx = S.queue[0];
   L.push(nx ? `Besok aku bangun ${CFG.nama[nx.type].toLowerCase()} ${EMO[nx.type] || ''}`.trim() : pick('besok', ['Besok bangun apa ya? Kalian yang tentukan 👇', 'Besok masih kosong. Isi dulu lewat komentar 👇']));
@@ -197,11 +198,16 @@ function step(prev, input) {
   if (S.pools.food < 0) { S.pools.food = 0; for (const r of named()) r.energy = clamp(r.energy - 10, 0, 100); log.events.push({ type: 'paceklik' }); }
 
   // 3c. satu rumah per warga bernama (rumah berlabel nama)
+  // Petak rumah terbatas (HOUSE_CAP, sisanya untuk bangunan lain). Warga setelahnya tinggal di apartemen (APT_CAP per gedung, maks 4 gedung).
+  const HOUSE_CAP = 70, APT_CAP = 24;
   for (const r of named()) if (!r.house && r.id !== 'budi') {
+    if (S.buildings.filter(b => b.type === 'rumah').length >= HOUSE_CAP) { r.house = 'apt'; log.events.push({ type: 'apt_for', user: r.username }); continue; }
     const id = 'b' + S.buildings.length;
     S.buildings.push({ id, type: 'rumah', rt: r.rt, status: 'done', damage: 0, by: r.id, byName: r.username, comment: null, day: S.day }); r.house = id;
     log.events.push({ type: 'house_for', user: r.username });
   }
+  const aptN = named().filter(r => r.house === 'apt').length;
+  S.apartemen = Math.min(4, Math.ceil(aptN / APT_CAP)); S.penghuniApt = aptN;
   // 4. houses (auto) + building queue
   for (const rt of S.rts) {
     if (!S.buildings.some(x => x.rt === rt.id && x.type === 'balai')) S.buildings.push({ id: 'b' + S.buildings.length, type: 'balai', rt: rt.id, status: 'done', damage: 0, by: null, comment: null, day: S.day });
@@ -267,7 +273,7 @@ function step(prev, input) {
   }
   const p = Math.min(0.35, 0.14 + 0.01 * S.population / 100);
   if (S.day >= 4 && S.day - dr.lastAttackDay >= 2 && !dr.pendingAttack && rand() < p) { dr.pendingAttack = true; dr.warning = true; log.events.push({ type: 'dragon_warning' }); }
-  log.stats = { population: S.population, named: named().length, food: S.pools.food, wood: S.pools.wood, kas: S.kas, utang: Math.max(0, -S.kas), buildings: S.buildings.filter(b => b.status === 'done').length, queue: S.queue.length };
+  log.stats = { population: S.population, named: named().length, food: S.pools.food, wood: S.pools.wood, kas: S.kas, utang: Math.max(0, -S.kas), buildings: S.buildings.filter(b => b.status === 'done').length, queue: S.queue.length, apartemen: S.apartemen || 0, penghuniApt: S.penghuniApt || 0 };
   const top = requests[0];
   log.usul_teratas = top ? { user: top.username, text: top.text, likes: top.likes, building: top.type } : null;
   log.proyek = S.buildings.filter(b => b.status === 'building').map(b => ({ building: b.type, tahap: b.tahap || 1, total: b.tahapTotal || 1, by: b.byName }));

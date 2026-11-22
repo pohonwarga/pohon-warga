@@ -39,6 +39,8 @@ function manualInput(world) {
   fs.mkdirSync(DATA, { recursive: true });
   let world = read('world.json', null) || newWorld(todayWIB());
   const cursor = read('cursor.json', { seen: [] });
+  // Satu hari simulasi per tanggal WIB: kalau hari ini sudah dijalankan (mis. manual), run terjadwal tidak maju lagi. Paksa dengan --force.
+  if (!args.includes('--force') && !args.includes('--fake') && !args.includes('--dry') && world.day > 0 && world.date >= todayWIB()) { console.log(`Hari ${world.day} (${world.date}) sudah dijalankan hari ini, dilewati. Pakai --force untuk memaksa.`); return; }
   const useFake = args.includes('--fake');
   let input, source;
   if (useFake) { input = fakeInput(world.day + 1); source = 'DATA PALSU'; }

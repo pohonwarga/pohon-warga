@@ -177,6 +177,7 @@ const APT_N=Math.min(4,Q.get('apt')?(+Q.get('apt')||4):(DATA.apartemen||0));
 const APT_AT=[[16,26],[26,26],[16,38],[26,38]];
 if(APT_N>0){try{
  const ag=(await GL.loadAsync('v5/apartemen_warga.glb')).scene;
+ const APC={apt_wall:0x4fae55,apt_wall2:0x2f8a42,apt_cream:0xcfe6b4};ag.traverse(m=>{if(m.isMesh&&m.material&&APC[m.material.name]!==undefined){m.material=m.material.clone();m.material.color.setHex(APC[m.material.name])}});
  const bx=new THREE.Box3().setFromObject(ag),sz=bx.getSize(new THREE.Vector3()),ct=bx.getCenter(new THREE.Vector3());
  const k=9/Math.max(sz.x,sz.z);
  for(let i=0;i<APT_N;i++){const a=ag.clone(true);a.traverse(m=>{if(m.isMesh){m.castShadow=true;m.receiveShadow=true}});

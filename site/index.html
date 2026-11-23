@@ -399,8 +399,9 @@ const onBridge=(x,z)=>{if(!BR)return false;const dx=x-BR.cx,dz=z-BR.cz;return Ma
 function blocked(x,z){if(!WT)return false;if(GB&&(x<GB.min.x+3||x>GB.max.x-3||z<GB.min.z+3||z>GB.max.z-3))return true;
  for(const[dx,dz]of[[0,0],[.45,0],[-.45,0],[0,.45],[0,-.45]]){const px=x+dx,pz=z+dz;if(!onBridge(px,pz)&&inWater(px,pz))return true}return false}
 function hashStr(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;return h}
+function mkBudi(){const m=window.__budi.clone(true);m.position.set(0,0,0);m.rotation.set(0,0,0);m.scale.setScalar(1.1);const sw=m.getObjectByName('Sweat001');if(sw)sw.visible=false;m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=false}});const g=new THREE.Group();g.add(m);const F=n=>m.getObjectByName(n);g.userData={lg:[F('leg1002'),F('leg-1002')].filter(Boolean),ar:[F('ArmL001'),F('ArmR001')].filter(Boolean)};return g}
 function startPlay(p){if(PL)stopPlay(true);prepWorld();
- const g=mkWarga(hashStr(p.user)%8),dx=-p.s.x,dz=-p.s.z,dl=Math.hypot(dx,dz)||1,Dx=dx/dl,Dz=dz/dl,sx=p.s.x+Dx*5.4,sz=p.s.z+Dz*5.4;
+ const g=p===BUDI_P?mkBudi():mkWarga(hashStr(p.user)%8),dx=-p.s.x,dz=-p.s.z,dl=Math.hypot(dx,dz)||1,Dx=dx/dl,Dz=dz/dl,sx=p.s.x+Dx*5.4,sz=p.s.z+Dz*5.4;
  PL=agent(g,.5,sx,sz,3.3,'player',{kind:'warga'});PL.h=Math.atan2(-Dx,-Dz);PL.lx=sx;PL.lz=sz;PL.user=p.user;
  const e=document.createElement('div');e.className='lbl me';e.textContent=p.name||'@'+p.user;lbBox.appendChild(e);PL.el=e;
  document.body.classList.add('play');SEL=p;fly=null;

@@ -237,6 +237,16 @@ if(APT_N>0){try{
       if(t==='terong'){add(new THREE.SphereGeometry(.12,6,4),ter,px,.36,z)}
       if(t==='selada'){add(new THREE.IcosahedronGeometry(.18,0),mrh,px,.28,z)}}});
  }
+ if(Q.get('telur')){
+  const eg=new THREE.Group();eg.position.set(1.6,0,6.0);
+  const shell=new THREE.Mesh(new THREE.SphereGeometry(.32,20,16),new THREE.MeshStandardMaterial({color:0xf2b428,metalness:.55,roughness:.28,emissive:0x5a3200,emissiveIntensity:.35}));
+  shell.scale.set(.85,1.12,.85);shell.position.y=.42;shell.castShadow=true;eg.add(shell);
+  const crk=new THREE.MeshStandardMaterial({color:0x7a3a14,roughness:.8,flatShading:true});
+  for(let i=0;i<9;i++){const a=i/9*Math.PI*2+.3,y=.28+(i%3)*.06;const c=new THREE.Mesh(new THREE.IcosahedronGeometry(.07,0),crk);c.scale.set(1.4,.5,1);c.position.set(Math.cos(a)*.27,y,Math.sin(a)*.23);c.lookAt(0,y*.5,0);eg.add(c)}
+  const cv=document.createElement('canvas');cv.width=128;cv.height=128;const cx=cv.getContext('2d');const gr=cx.createRadialGradient(64,64,4,64,64,64);gr.addColorStop(0,'rgba(190,110,255,0.95)');gr.addColorStop(.45,'rgba(150,70,235,0.45)');gr.addColorStop(1,'rgba(120,40,220,0)');cx.fillStyle=gr;cx.fillRect(0,0,128,128);
+  const aura=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));aura.scale.set(2.4,2.4,1);aura.position.y=.5;eg.add(aura);
+  g.add(eg);
+ }
  S.add(g);
 }catch(e){console.warn('kebun gagal',e)}}
 const tmp=new THREE.Vector3();

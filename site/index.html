@@ -199,12 +199,12 @@ if(Q.get('kebun')){try{
  const bench=(x,z,ry)=>{const b=new THREE.Group();add(new THREE.BoxGeometry(1.5,.1,.5),wood,0,.5,0,b);add(new THREE.BoxGeometry(1.5,.45,.08),wood,0,.82,-.22,b);
   [-.6,.6].forEach(o=>add(new THREE.BoxGeometry(.1,.5,.45),dark,o,.25,0,b));b.position.set(x,0,z);b.rotation.y=ry;g.add(b)};
  bench(-4.3,0,Math.PI/2);bench(0,-4.3,0);
- for(let i=0;i<8;i++){const t=i/7,x=-3.2+t*6.4;add(new THREE.BoxGeometry(.9,.1,1.1),wood,x,.14+Math.sin(t*Math.PI)*.35,.2)}
- [-.55,.95].forEach(z=>{for(let i=0;i<8;i+=1){const t=i/7,x=-3.2+t*6.4;add(new THREE.BoxGeometry(.08,.5,.08),dark,x,.5+Math.sin(t*Math.PI)*.35,z)}});
+ for(let i=0;i<8;i++){const t=i/7,x=-2.4+t*4.8;add(new THREE.BoxGeometry(.7,.1,1.1),wood,x,.14+Math.sin(t*Math.PI)*.35,.2)}
+ [-.55,.95].forEach(z=>{for(let i=0;i<8;i+=1){const t=i/7,x=-2.4+t*4.8;add(new THREE.BoxGeometry(.08,.5,.08),dark,x,.5+Math.sin(t*Math.PI)*.35,z)}});
  const bd=builds.find(b=>b.type==='kebun'),nm=bd&&(bd.user||bd.username||bd.by)||'alincarisaputri';
  const cv=document.createElement('canvas');cv.width=256;cv.height=96;const c2=cv.getContext('2d');c2.fillStyle='#e8c58a';c2.fillRect(0,0,256,96);c2.strokeStyle='#6e4a28';c2.lineWidth=6;c2.strokeRect(3,3,250,90);c2.fillStyle='#3b2a16';c2.textAlign='center';c2.font='bold 24px sans-serif';c2.fillText('Kebun Warga',128,36);c2.font='bold 20px sans-serif';c2.fillText('Usulan @'+nm,128,70);
  const sg=new THREE.Mesh(new THREE.PlaneGeometry(2.2,.82),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv)}));sg.position.set(2.2,1.2,5);g.add(sg);
- add(new THREE.BoxGeometry(.12,1.2,.12),dark,2.2,.6,4.95);
+ add(new THREE.BoxGeometry(.12,1.2,.12),dark,2.2,.6,4.88);
  S.add(g);
 }catch(e){console.warn('kebun gagal',e)}}
 const tmp=new THREE.Vector3();

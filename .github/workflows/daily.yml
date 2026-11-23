@@ -1,7 +1,7 @@
 name: Hari baru Pohon Warga
 on:
   schedule:
-    - cron: '30 12 * * *'   # 19:30 WIB (GitHub bisa terlambat beberapa menit)
+    - cron: '0 9 * * *'     # 16:00 WIB = gerbang komen tutup (GitHub bisa terlambat beberapa menit)
   workflow_dispatch:        # tombol jalankan manual
     inputs:
       dry:

@@ -58,7 +58,7 @@ function bubble(txt){const c=document.createElement('canvas');c.width=640;c.heig
  g.fillStyle='#17102b';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,320,78);
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));sp.scale.set(4.4,1.375,1);sp.renderOrder=11;sp.center.set(.5,0);return sp}
 const hairs2=[0x2b1b2e,0x3b2318,0x9b0f27,0x262c60,0x6b3bb5];
-const names=['@dewi_ananda','@raka_wp','@ronda.nia','@putri.id','@mbak.tia','Pak RT Budi','@arif_n','@kiki.w','@lintang.c','@yoga_9'];
+const names=['@dewi_ananda','@raka_wp','@ronda.nia','@putri.id','@mbak.tia','Mayor Budi','@arif_n','@kiki.w','@lintang.c','@yoga_9'];
 let nameI=0;
 const SP_META=await (await fetch('sprites/meta.json')).json();
 const _TL=new THREE.TextureLoader();
@@ -534,7 +534,7 @@ function renderRT(rtId){curRT=rtId;window.__desaCol=desaColor(rtId);for(const o 
    else if(ac==='chat'){if(partner){const o=partner.A;A.mate=o;o.mate=A;gp.rotation.y=Math.atan2(partner.x-px,partner.z-pz);o.g.rotation.y=Math.atan2(px-partner.x,pz-partner.z);A.talk=0;o.talk=1}else{window.__pendChat={x:px,z:pz,A,alive:true};A.talk=0}}
    if(FD.some(f=>Math.hypot(f.x-px,f.z-pz)<5.5)&&ac!=='sleep')A.cheer=true}
   window.__forceJob=null;window.__forceLv=null;window.__forceSay=null;window.__forceLook=null});
- if(rtId==='rt01'){window.__forceShirt=0xe8363d;window.__forceHair=0x14101a;window.__forceProp='none';const bu=person(3,0,10.5,.62,'Pak RT Budi','budi');window.__forceShirt=null;window.__forceHair=null;bu.rotation.y=.35;pmap.budi=bu;window.BUDI=bu;{const A=bu.userData.act;A.type='budi';A.speed=.95;A.pause=3.6;A.pause=2.5;const Rr=fronts.length?Math.min(15,Math.max(9,fronts.reduce((q,f)=>q+Math.hypot(f.x,f.z),0)/fronts.length)):11,a0=Math.atan2(3,10.5);A.path=[0,.5,1.0,1.5,1.0,.5].map(d=>[Math.sin(a0+d)*Rr,Math.cos(a0+d)*Rr])}}
+ if(rtId==='rt01'){window.__forceShirt=0xe8363d;window.__forceHair=0x14101a;window.__forceProp='none';const bu=person(3,0,10.5,.62,'Mayor Budi','budi');window.__forceShirt=null;window.__forceHair=null;bu.rotation.y=.35;pmap.budi=bu;window.BUDI=bu;{const A=bu.userData.act;A.type='budi';A.speed=.95;A.pause=3.6;A.pause=2.5;const Rr=fronts.length?Math.min(15,Math.max(9,fronts.reduce((q,f)=>q+Math.hypot(f.x,f.z),0)/fronts.length)):11,a0=Math.atan2(3,10.5);A.path=[0,.5,1.0,1.5,1.0,.5].map(d=>[Math.sin(a0+d)*Rr,Math.cos(a0+d)*Rr])}}
  if(EMPTY&&Q.has('balai')){const sl=slots[0],ry=Math.atan2(-sl.x,-sl.z);window.BALAI=BUILD.balai(sl.x,sl.z,ry);window.BALAI.visible=false;window.BALAI_POS=sl}
  window.TGG=TG;dynS=S.children.slice(n0);
  const R1=DATA.rts.find(r=>r.id===rtId);document.querySelector('.pill b').textContent='Desa '+R1.number;$('pop').textContent=R1.pop.toLocaleString('id-ID')+' warga di pulau ini · '+bl.filter(b=>b.status==='done').length+' bangunan';

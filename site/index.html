@@ -40,7 +40,7 @@ body.play #side,body.play #bar,body.play #info{display:none!important}
 #load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#7fc4ea;color:#1A1466;font-weight:700;font-size:16px;transition:opacity .5s}
 </style></head><body>
 <canvas id="c"></canvas>
-<div id="lbls"></div><div class="lbl" id="bn" style="display:none;background:#fff">Pak RT Budi</div><div class="lbl" id="bub" style="display:none;background:#FFC227;font-size:12px">Waduh!</div>
+<div id="lbls"></div><div class="lbl" id="bn" style="display:none;background:#fff">Mayor Budi</div><div class="lbl" id="bub" style="display:none;background:#FFC227;font-size:12px">Waduh!</div>
 <div class="hud" id="top"><div class="logo">🌳 POHON WARGA</div><div><span class="chip w" id="pop">… warga</span><span class="chip" id="day">HARI KE-…</span></div></div>
 <div class="hud" id="side"><input id="q" placeholder="Cari rumah warga (tanpa @)" autocomplete="off"><div id="res"></div></div>
 <div class="hud" id="info" style="display:none"></div>
@@ -362,15 +362,16 @@ function updLabels(){
 }
 // ---------- pencarian + terbang ke rumah ----------
 let fly=null;
+const BUDI_P={user:'budi',name:'Mayor Budi',get s(){const v=window.__budi?window.__budi.getWorldPosition(new THREE.Vector3()):new THREE.Vector3(0,0,0);return{x:v.x,z:v.z,sector:'balai'}},b:{id:'balai',day:0},f:false,el:{classList:{toggle(){}}}};
 function flyTo(p){SEL=p;placed.forEach(x=>x.el.classList.toggle('sel',x===p));
  const t=new THREE.Vector3(p.s.x,3,p.s.z),dir=new THREE.Vector3(p.s.x,0,p.s.z).normalize();
  const side=new THREE.Vector3(-dir.z,0,dir.x),to=t.clone().sub(dir.clone().multiplyScalar(13)).add(side.multiplyScalar(20)).add(new THREE.Vector3(0,16,0));
  fly={t0:performance.now(),a:controls.target.clone(),b:t,pa:cam.position.clone(),pb:to};
- const i=document.getElementById('info');i.style.display='block';i.innerHTML=`<b>@${p.user}</b>${p.f?' ★ Warga Pendiri':''}<br>Rumah ${p.b.id} · Sektor ${p.s.sector} · Hari ke-${p.b.day}<br><button class="btn" id="play">🎮 Main sebagai @${p.user}</button>`;document.getElementById('play').onclick=()=>startPlay(p)}
+ const i=document.getElementById('info');i.style.display='block';i.innerHTML=`<b>${p.name||'@'+p.user}</b>${p.f?' ★ Warga Pendiri':''}<br>Rumah ${p.b.id} · Sektor ${p.s.sector} · Hari ke-${p.b.day}<br><button class="btn" id="play">🎮 Main sebagai ${p.name||'@'+p.user}</button>`;document.getElementById('play').onclick=()=>startPlay(p)}
 const qi=document.getElementById('q'),rs=document.getElementById('res');
 qi.addEventListener('input',()=>{const v=qi.value.trim().replace(/^@/,'').toLowerCase();rs.innerHTML='';if(!v)return;
- placed.filter(p=>p.user.toLowerCase().includes(v)).slice(0,5).forEach(p=>{const d=document.createElement('div');d.innerHTML=`@${p.user} <small>· sektor ${p.s.sector}</small>`;d.onclick=()=>{flyTo(p);rs.innerHTML='';qi.blur()};rs.appendChild(d)});
- if(!rs.children.length){const d=document.createElement('div');d.textContent='Belum ketemu. Follow @pohonwarga lalu komen untuk dapat rumah!';rs.appendChild(d)}});
+ const hits=placed.filter(p=>p.user.toLowerCase().includes(v)).slice(0,5);if(window.__budi&&('budi'.includes(v)||'mayor'.includes(v)||'mayor budi'.includes(v)))hits.push(BUDI_P);
+ hits.forEach(p=>{const d=document.createElement('div');d.innerHTML=`${p.name||'@'+p.user} <small>· ${p===BUDI_P?'balai desa':'sektor '+p.s.sector}</small>`;d.onclick=()=>{flyTo(p);rs.innerHTML='';qi.blur()};rs.appendChild(d)}); if(!rs.children.length){const d=document.createElement('div');d.textContent='Belum ketemu. Follow @pohonwarga lalu komen untuk dapat rumah!';rs.appendChild(d)}});
 function goHome(){SEL=null;placed.forEach(x=>x.el.classList.remove('sel'));document.getElementById('info').style.display='none';fly={t0:performance.now(),a:controls.target.clone(),b:HOME.t.clone(),pa:cam.position.clone(),pb:HOME.p.clone()}}
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(PL)stopPlay();else goHome()}});
 
@@ -401,7 +402,7 @@ function hashStr(t){let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;return
 function startPlay(p){if(PL)stopPlay(true);prepWorld();
  const g=mkWarga(hashStr(p.user)%8),dx=-p.s.x,dz=-p.s.z,dl=Math.hypot(dx,dz)||1,Dx=dx/dl,Dz=dz/dl,sx=p.s.x+Dx*5.4,sz=p.s.z+Dz*5.4;
  PL=agent(g,.5,sx,sz,3.3,'player',{kind:'warga'});PL.h=Math.atan2(-Dx,-Dz);PL.lx=sx;PL.lz=sz;PL.user=p.user;
- const e=document.createElement('div');e.className='lbl me';e.textContent='@'+p.user;lbBox.appendChild(e);PL.el=e;
+ const e=document.createElement('div');e.className='lbl me';e.textContent=p.name||'@'+p.user;lbBox.appendChild(e);PL.el=e;
  document.body.classList.add('play');SEL=p;fly=null;
  controls.minDistance=5;controls.maxDistance=15;controls.enablePan=false;
  controls.target.set(sx,1.1,sz);cam.position.set(sx+Dx*9,6.6,sz+Dz*9);controls.update()}

@@ -166,6 +166,7 @@ for(const b of builds){
  if(b.status==='building'){h.scale.multiplyScalar(.75);h.traverse(m=>{if(m.isMesh){m.material=m.material.clone();m.material.transparent=true;m.material.opacity=.6}})}
  S.add(h);
  const user=LBL[b.id]||(b.by&&DATA.residents&&DATA.residents[b.by]?DATA.residents[b.by].username.replace(/^@/,''):null);
+ if(b.type!=='rumah'&&b.type!=='balai'&&user){const cv=document.createElement('canvas');cv.width=256;cv.height=96;const x=cv.getContext('2d');x.fillStyle='#fff3d6';x.fillRect(0,0,256,96);x.strokeStyle='#5a3a1e';x.lineWidth=8;x.strokeRect(4,4,248,88);x.fillStyle='#3a2410';x.font='bold 28px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('Usulan @'+user,128,48);const t=new THREE.CanvasTexture(cv);const sg=new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.82),new THREE.MeshBasicMaterial({map:t,transparent:true}));sg.position.set(s.x,1.6,s.z);sg.rotation.y=s.ry;S.add(sg)}
  placed.push({b,s,h,user:user||('rumah '+b.id),cls:SECT[s.sector].cls});
 }
 

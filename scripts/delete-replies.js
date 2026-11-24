@@ -1,4 +1,4 @@
-// Hapus SEMUA balasan komentar yang dibuat akun sendiri (@pohonwarga) di 12 post terakhir.
+// Hapus SEMUA balasan komentar yang dibuat akun sendiri (@pohonwarga) di post TERBARU saja (Day 4).
 // Pakai: node scripts/delete-replies.js [--dry]   (--dry hanya menghitung/mencetak, tidak menghapus)
 // Tidak mengubah site/data/replied.json, jadi komentar lama tidak dibalas ulang.
 const BASE = `https://${process.env.IG_API_HOST || 'graph.facebook.com'}/v21.0`;
@@ -18,7 +18,9 @@ async function call(method, p, params = {}) {
   const uid = process.env.IG_USER_ID;
   if (!process.env.IG_TOKEN || !uid) throw new Error('IG_TOKEN / IG_USER_ID belum diisi');
   const me = (await call('GET', `/${uid}`, { fields: 'username' })).username.toLowerCase();
-  const media = await call('GET', `/${uid}/media`, { fields: 'id', limit: 12 });
+  const media = await call('GET', `/${uid}/media`, { fields: 'id,timestamp,permalink,caption', limit: 12 });
+  media.data = (media.data || []).slice(0, 1);                         // HANYA post terbaru (Day 4)
+  for (const m of media.data) console.log(`Post sasaran: ${m.permalink} (${m.timestamp}) "${String(m.caption || '').slice(0, 50).replace(/\n/g, ' ')}"`);
   const mine = [];
   for (const m of media.data || []) {
     let r = await call('GET', `/${m.id}/comments`, { fields: 'id,username,text,replies{id,username,text}', limit: 50 });

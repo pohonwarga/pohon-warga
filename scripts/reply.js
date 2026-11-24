@@ -4,7 +4,10 @@
 // Env: IG_TOKEN, IG_USER_ID (opsional IG_API_HOST)
 // Catatan: id komentar yang sudah dibalas disimpan di site/data/replied.json supaya tidak dobel.
 const fs = require('fs'), path = require('path');
-const { parseBuild, CFG } = require('../engine/engine');
+const { parseBuild: parseBuildRaw, CFG } = require('../engine/engine');
+// "taman bermain / playground / wahana" bukan kebun (di engine kata "taman" = kebun): dicatat sebagai usulan biasa.
+const NOT_KEBUN = /taman\s+(bermain|hiburan|main|anak|wahana|rekreasi)|playground|wahana|kolam renang/i;
+const parseBuild = t => (NOT_KEBUN.test(String(t)) ? null : parseBuildRaw(t));
 
 const BASE = `https://${process.env.IG_API_HOST || 'graph.facebook.com'}/v21.0`;
 const DATA = process.env.DATA_DIR || path.join(__dirname, '..', 'site', 'data');
@@ -88,6 +91,16 @@ const T_JOBBUILD = [    // komentar berisi job DAN permintaan bangunan
   '@{u} siap, jobmu {j} dan usulan {b} sudah dicatat {e} Pantau update desa ya 📝',
   '@{u} dua-duanya tercatat: {j} dan usulan {b} {e} Makasih sudah ikut ramaikan desa 🏘️',
 ];
+const T_WELCOME_DONE = [   // untuk yang SUDAH memilih job: tidak disuruh pilih lagi
+  '@{u} makasih ya! {e} Jobmu sudah tercatat, tinggal tunggu perang besar 🏡',
+  '@{u} halo warga! {e} Jobmu sudah aman di catatan Mayor Budi. Ajak temanmu gabung ya 🙌',
+  '@{u} terima kasih sudah jadi warga! {e} Pantau update desa tiap malam ya 🏘️',
+];
+const T_SORRY_DONE = [
+  '@{u} maaf ya, kamu tidak dicuekin kok! 🥺 Komenmu sudah terbaca, jobmu juga sudah tercatat 🙏',
+  '@{u} waduh, maaf banget! 🥺 Sekarang sudah terbaca kok. Terima kasih sudah sabar ya 🙏',
+  '@{u} maaf ya kalau sempat kelewat 😢 Sekarang sudah terbaca, jobmu sudah tercatat 💪',
+];
 const JOB_CTA = ' Pilih jobmu juga: KNIGHT, MAGE, atau RANGER ⚔️';
 function detectJob(text) {
   const t = String(text);
@@ -105,7 +118,8 @@ const T_KELUAR = [
   '@{u} oke, dicatat ya. Makasih sudah mampir, kapan-kapan main lagi 👋',
 ];
 
-function pickReply(c) {
+function pickReply(c, ctx = {}) {
+  const done = !!(ctx.chosen && c.username && ctx.chosen.has(String(c.username).toLowerCase()));   // sudah pilih job
   const text = String(c.text || '');
   const h = hashStr(c.id);
   let list, b = '', e = pick(GENERIC_EMO, h);
@@ -120,13 +134,13 @@ function pickReply(c) {
     return pick(T_JOB[job], h).replace('{u}', c.username);
   }
   if (/\bkeluar\b/i.test(text)) list = T_KELUAR;
-  else if (/(ga|gak|nggak|tidak|ngga|belum)\s*(di)?(anggap|notice|bales|balas|respon)|dicuekin|diabaikan|cuek/i.test(text)) list = T_SORRY;
+  else if (/(ga|gak|nggak|tidak|ngga|belum)\s*(di)?(anggap|notice|bales|balas|respon)|dicuekin|diabaikan|cuek/i.test(text)) list = done ? T_SORRY_DONE : T_SORRY;
   else if (items >= 3) list = T_MULTI;
   else if (buildable) { list = T_BUILD; b = NAMA[buildable] || buildable; e = pick(EMO_BUILD[buildable] || GENERIC_EMO, h >>> 3); }
   else if (/\b(bangun|bikin|buat|buatin|dong|minta|tambah)/i.test(text)) { list = T_NOBUILD; e = emojiFor(text, h >>> 3); }
-  else { list = T_WELCOME; e = own || pick(['🙌', '😊', '🎉'], h >>> 3); }
+  else { list = done ? T_WELCOME_DONE : T_WELCOME; e = own || pick(['🙌', '😊', '🎉'], h >>> 3); }
   let out = pick(list, h).replace('{u}', c.username).replace('{b}', b).replace('{e}', e);
-  if ([T_BUILD, T_NOBUILD, T_MULTI].includes(list)) out += JOB_CTA;       // Day 4: semua balasan ajak pilih job
+  if (!done && [T_BUILD, T_NOBUILD, T_MULTI].includes(list)) out += JOB_CTA;       // Day 4: semua balasan ajak pilih job
   return out;
 }
 
@@ -155,6 +169,7 @@ async function main() {
   const me = (await call('GET', `/${uid}`, { fields: 'username' })).username;
   const media = await call('GET', `/${uid}/media`, { fields: 'id', limit: 12 });
   media.data = (media.data || []).slice(0, 1);   // hanya post TERBARU (video Day 4 hari ini)
+  const chosen = new Set(Object.keys((readJson(path.join(DATA, 'job-votes.json'), {}).votes) || {}));   // warga yang sudah pilih job
   const todo = [];
   for (const m of media.data || []) {
     let r = await call('GET', `/${m.id}/comments`, { fields: 'id,text,username,timestamp,replies{username}', limit: 50 });
@@ -162,6 +177,7 @@ async function main() {
       for (const c of r.data || []) {
         if (!c.id || !c.username || !c.text) continue;
         if (c.username.toLowerCase() === me.toLowerCase()) continue;       // komentar sendiri
+        if (detectJob(c.text)) chosen.add(c.username.toLowerCase());
         if (done.has(c.id)) continue;                                     // sudah dibalas oleh script
         const ownReply = ((c.replies && c.replies.data) || []).some(x => (x.username || '').toLowerCase() === me.toLowerCase());
         if (ownReply) { done.add(c.id); continue; }                       // sudah dibalas manual
@@ -174,7 +190,7 @@ async function main() {
   console.log(`${todo.length} komentar belum dibalas (akan diproses maksimal ${Math.min(MAX, quota)}, sisa kuota hari ini ${quota}/${DAILY_MAX}).${DRY ? ' MODE DRY: tidak mengirim apa pun.' : ''}`);
   let sent = 0;
   for (const c of todo.slice(0, Math.min(MAX, quota))) {
-    const msg = pickReply(c);
+    const msg = pickReply(c, { chosen });
     if (DRY) { console.log(`- @${c.username}: "${c.text}"\n    -> ${msg}`); continue; }
     try {
       await call('POST', `/${c.id}/replies`, { message: msg });

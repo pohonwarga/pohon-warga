@@ -54,17 +54,41 @@ const T_NOBUILD = [     // permintaan di luar pilihan: cukup dicatat, tidak menj
   '@{u} {e} ide bagus, dicatat dulu ya. Makasih udah ikut meramaikan desa! ✨',
   '@{u} {e} makasih ya, usulanmu tercatat! Pantau terus update desa tiap malam 🏘️',
 ];
-const T_WELCOME = [     // sapaan, emoji, "sudah follow", dll
-  '@{u} makasih ya! {e} Sekarang kamu warga desa ini 🏡 Mau dibangun apa? Contoh: "bangun warung" atau "bangun jembatan".',
-  '@{u} halo warga! {e} Tulis bangunan yang kamu mau, misalnya "bangun rumah", biar Mayor Budi bisa catat.',
-  '@{u} selamat datang di desa! {e} Komen bangunan yang kamu mau ya, misalnya "bangun kebun" 🌷',
-  '@{u} terima kasih sudah jadi warga! {e} Mau desa ini dibangun apa dulu? Tulis di komen ya 🏗️',
+const T_WELCOME = [     // sapaan, emoji, "sudah follow", dll -> ajak pilih job (Day 4)
+  '@{u} makasih ya! {e} Sekarang kamu warga desa ini 🏡 Pilih jobmu: komen KNIGHT, MAGE, atau RANGER ⚔️',
+  '@{u} halo warga! {e} Perang besar akan datang, pilih jobmu dulu ya: KNIGHT, MAGE, atau RANGER 🛡️',
+  '@{u} selamat datang di desa! {e} Komen jobmu sekarang: KNIGHT, MAGE, atau RANGER ⚔️',
+  '@{u} terima kasih sudah jadi warga! {e} Mau jadi apa saat perang? Komen KNIGHT, MAGE, atau RANGER 🏹',
 ];
 const T_SORRY = [       // komentar kecewa / merasa tidak dianggap
-  '@{u} maaf ya, kamu tidak dicuekin kok! 🥺 Tulis bangunan yang kamu mau, misalnya "bangun kebun", biar Mayor Budi bisa catat usulanmu 🙏',
-  '@{u} waduh, maaf banget! 🥺 Komenmu sudah terbaca. Coba tulis ulang dengan bangunan yang jelas, misalnya "bangun sumur", biar masuk daftar ya 🙏',
-  '@{u} maaf ya kalau sempat kelewat 😢 Sekarang sudah terbaca kok! Tulis bangunan yang kamu mau biar Mayor Budi catat 💪',
+  '@{u} maaf ya, kamu tidak dicuekin kok! 🥺 Komenmu sudah terbaca. Pilih jobmu: KNIGHT, MAGE, atau RANGER 🙏',
+  '@{u} waduh, maaf banget! 🥺 Sekarang sudah terbaca kok. Tulis jobmu ya: KNIGHT, MAGE, atau RANGER 🙏',
+  '@{u} maaf ya kalau sempat kelewat 😢 Sekarang sudah terbaca! Komen jobmu: KNIGHT, MAGE, atau RANGER 💪',
 ];
+const T_JOB = {         // pilihan job (Day 4): {j} = nama job
+  KNIGHT: [
+    '@{u} siap, kamu tercatat jadi KNIGHT! 🛡️ Garis depan desa ini sekarang punya kamu ⚔️',
+    '@{u} KNIGHT dicatat Mayor Budi! 🛡️ Siap jadi tameng desa saat perang besar ⚔️',
+    '@{u} oke, jobmu KNIGHT! ⚔️ Pedang dan perisai menunggu kamu 🛡️',
+  ],
+  MAGE: [
+    '@{u} siap, kamu tercatat jadi MAGE! 🔮 Sihirmu ditunggu saat perang besar ✨',
+    '@{u} MAGE dicatat Mayor Budi! 🪄 Siap jadi penyihir desa ini ✨',
+    '@{u} oke, jobmu MAGE! 🔮 Tongkat sihirmu sudah disiapkan 🪄',
+  ],
+  RANGER: [
+    '@{u} siap, kamu tercatat jadi RANGER! 🏹 Panahmu ditunggu saat perang besar 🎯',
+    '@{u} RANGER dicatat Mayor Budi! 🏹 Siap jadi pemanah desa ini 🎯',
+    '@{u} oke, jobmu RANGER! 🎯 Busur dan panah sudah disiapkan 🏹',
+  ],
+};
+const JOB_CTA = ' Pilih jobmu juga: KNIGHT, MAGE, atau RANGER ⚔️';
+function detectJob(text) {
+  const t = String(text);
+  const m = t.match(/\b(knight|ksatria|swordman|swordsman|pedang)\b|\b(mage|penyihir|sihir)\b|\b(r[ae]ng+[ae]r|archer|pemanah|panah)\b/i);
+  if (!m) return null;
+  return m[1] ? 'KNIGHT' : m[2] ? 'MAGE' : 'RANGER';
+}
 const T_MULTI = [       // satu komentar berisi banyak permintaan
   '@{u} wah, daftarnya lengkap banget! 😄 Mayor Budi catat semuanya, tapi dibangun satu per satu ya. Terima kasih usulannya 🙌',
   '@{u} semangat banget usulannya! 🤩 Semua tercatat ya, nanti dibangun bertahap. Makasih 🙏',
@@ -82,13 +106,17 @@ function pickReply(c) {
   const own = (text.match(/\p{Extended_Pictographic}/u) || [])[0];       // emoji yang dipakai si pengomentar
   const items = text.split(/,|\bsama\b|\bdan\b|\bserta\b/i).filter(x => x.trim().length > 2).length;
   const buildable = /rumah sakit|rumah ibadah/i.test(text) ? null : parseBuild(text);  // "rumah sakit" bukan "rumah"
+  const job = detectJob(text);
+  if (job) return pick(T_JOB[job], h).replace('{u}', c.username);
   if (/\bkeluar\b/i.test(text)) list = T_KELUAR;
   else if (/(ga|gak|nggak|tidak|ngga|belum)\s*(di)?(anggap|notice|bales|balas|respon)|dicuekin|diabaikan|cuek/i.test(text)) list = T_SORRY;
   else if (items >= 3) list = T_MULTI;
   else if (buildable) { list = T_BUILD; b = NAMA[buildable] || buildable; e = pick(EMO_BUILD[buildable] || GENERIC_EMO, h >>> 3); }
   else if (/\b(bangun|bikin|buat|buatin|dong|minta|tambah)/i.test(text)) { list = T_NOBUILD; e = emojiFor(text, h >>> 3); }
   else { list = T_WELCOME; e = own || pick(['🙌', '😊', '🎉'], h >>> 3); }
-  return pick(list, h).replace('{u}', c.username).replace('{b}', b).replace('{e}', e);
+  let out = pick(list, h).replace('{u}', c.username).replace('{b}', b).replace('{e}', e);
+  if ([T_BUILD, T_NOBUILD, T_MULTI].includes(list)) out += JOB_CTA;       // Day 4: semua balasan ajak pilih job
+  return out;
 }
 
 async function call(method, p, params = {}) {

@@ -82,6 +82,12 @@ const T_JOB = {         // pilihan job (Day 4): {j} = nama job
     '@{u} oke, jobmu RANGER! 🎯 Busur dan panah sudah disiapkan 🏹',
   ],
 };
+const JOB_NAME = { KNIGHT: 'KNIGHT 🛡️', MAGE: 'MAGE 🔮', RANGER: 'RANGER 🏹' };
+const T_JOBBUILD = [    // komentar berisi job DAN permintaan bangunan
+  '@{u} {j} tercatat! Usulan {b} juga masuk daftar Mayor Budi {e} Terima kasih ya 🙌',
+  '@{u} siap, jobmu {j} dan usulan {b} sudah dicatat {e} Pantau update desa ya 📝',
+  '@{u} dua-duanya tercatat: {j} dan usulan {b} {e} Makasih sudah ikut ramaikan desa 🏘️',
+];
 const JOB_CTA = ' Pilih jobmu juga: KNIGHT, MAGE, atau RANGER ⚔️';
 function detectJob(text) {
   const t = String(text);
@@ -107,7 +113,12 @@ function pickReply(c) {
   const items = text.split(/,|\bsama\b|\bdan\b|\bserta\b/i).filter(x => x.trim().length > 2).length;
   const buildable = /rumah sakit|rumah ibadah/i.test(text) ? null : parseBuild(text);  // "rumah sakit" bukan "rumah"
   const job = detectJob(text);
-  if (job) return pick(T_JOB[job], h).replace('{u}', c.username);
+  if (job) {
+    const bd = /rumah sakit|rumah ibadah/i.test(text) ? null : parseBuild(text);
+    const wants = bd || /\b(bangun|bikin|buatin|tambah|minta|usul)/i.test(text);
+    if (wants) { const bn = bd ? (NAMA[bd] || bd) : 'bangunanmu'; const eb = bd ? pick(EMO_BUILD[bd] || GENERIC_EMO, h >>> 3) : emojiFor(text, h >>> 3); return pick(T_JOBBUILD, h).replace('{u}', c.username).replace('{j}', JOB_NAME[job]).replace('{b}', bn).replace('{e}', eb); }
+    return pick(T_JOB[job], h).replace('{u}', c.username);
+  }
   if (/\bkeluar\b/i.test(text)) list = T_KELUAR;
   else if (/(ga|gak|nggak|tidak|ngga|belum)\s*(di)?(anggap|notice|bales|balas|respon)|dicuekin|diabaikan|cuek/i.test(text)) list = T_SORRY;
   else if (items >= 3) list = T_MULTI;
@@ -180,4 +191,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error('GAGAL:', e.message); process.exit(1); });
-module.exports = { pickReply };
+module.exports = { pickReply, detectJob };

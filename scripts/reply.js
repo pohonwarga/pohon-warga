@@ -13,7 +13,7 @@ const args = process.argv.slice(2);
 const DRY = args.includes('--dry');
 const MAX = parseInt((args[args.indexOf('--max') + 1]) || '30', 10) || 30;
 // Batas balasan per hari (tanggal WIB). Bisa diubah lewat env DAILY_REPLY_MAX.
-const DAILY_MAX = parseInt(process.env.DAILY_REPLY_MAX || '30', 10) || 30;
+const DAILY_MAX = parseInt(process.env.DAILY_REPLY_MAX || '50', 10) || 50;
 const todayWIB = () => new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const hashStr = s => { let h = 0; for (const ch of String(s)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
@@ -154,6 +154,7 @@ async function main() {
   const quota = Math.max(0, DAILY_MAX - countToday);
   const me = (await call('GET', `/${uid}`, { fields: 'username' })).username;
   const media = await call('GET', `/${uid}/media`, { fields: 'id', limit: 12 });
+  media.data = (media.data || []).slice(0, 1);   // hanya post TERBARU (video Day 4 hari ini)
   const todo = [];
   for (const m of media.data || []) {
     let r = await call('GET', `/${m.id}/comments`, { fields: 'id,text,username,timestamp,replies{username}', limit: 50 });

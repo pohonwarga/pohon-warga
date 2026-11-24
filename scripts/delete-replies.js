@@ -27,18 +27,22 @@ async function call(method, p, params = {}) {
     for (let page = 0; r && page < 10; page++) {
       for (const c of r.data || []) {
         if ((c.username || '').toLowerCase() === me) continue;
-        for (const x of (c.replies && c.replies.data) || []) if ((x.username || '').toLowerCase() === me) mine.push({ id: x.id, to: c.username, text: x.text });
+        for (const x of (c.replies && c.replies.data) || []) if ((x.username || '').toLowerCase() === me) mine.push({ id: x.id, parent: c.id, to: c.username, text: x.text });
       }
       r = r.paging && r.paging.next ? await (await fetch(r.paging.next)).json() : null;
     }
   }
   console.log(`${mine.length} balasan milik @${me} ditemukan.${DRY ? ' MODE DRY: tidak menghapus.' : ''}`);
-  let ok = 0, fail = 0;
+  let ok = 0, fail = 0; const gone = new Set();
   for (const x of mine) {
     if (DRY) { console.log(`- ke @${x.to}: ${String(x.text).slice(0, 70)}`); continue; }
-    try { await call('DELETE', `/${x.id}`); ok++; console.log(`Terhapus (ke @${x.to})`); }
+    try { await call('DELETE', `/${x.id}`); ok++; gone.add(x.parent); console.log(`Terhapus (ke @${x.to})`); }
     catch (e) { fail++; console.log(`Gagal hapus (ke @${x.to}): ${e.message}`); }
     await sleep(1500);
+  }
+  if (!DRY && gone.size) {   // komentar yang balasannya dihapus boleh dibalas lagi dengan template baru
+    const f = require('path').join(__dirname, '..', 'site', 'data', 'replied.json'); const fs = require('fs');
+    try { const st = JSON.parse(fs.readFileSync(f, 'utf8')); st.ids = (st.ids || []).filter(i => !gone.has(i)); fs.writeFileSync(f, JSON.stringify(st)); console.log(`${gone.size} komentar dibuka lagi untuk dibalas template baru.`); } catch (e) { console.log('replied.json tidak diubah: ' + e.message); }
   }
   console.log(`Selesai. Terhapus: ${ok}, gagal: ${fail}.`);
 })().catch(e => { console.error('GAGAL:', e.message); process.exit(1); });

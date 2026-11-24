@@ -7,7 +7,7 @@ on:
         type: boolean
         default: true
 permissions:
-  contents: read
+  contents: write
 concurrency: pohon-warga-daily
 jobs:
   hapus:
@@ -22,3 +22,10 @@ jobs:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
         run: node scripts/delete-replies.js ${{ inputs.dry && '--dry' || '' }}
+      - name: Simpan catatan
+        if: ${{ !inputs.dry }}
+        run: |
+          git config user.name "pohon-warga-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add site/data/replied.json
+          git diff --cached --quiet || (git commit -m "Buka lagi komentar untuk dibalas template baru" && git pull --rebase -q && git push)

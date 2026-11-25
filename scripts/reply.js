@@ -42,66 +42,99 @@ function emojiFor(text, h) { for (const [re, es] of EMO_WORDS) if (re.test(text)
 
 // Template. {u} = username, {b} = nama bangunan, {e} = emoji. Dipilih deterministik dari id komentar.
 const T_BUILD = [       // bangunan yang dikenali
-  '@{u} usulan {b} sudah tercatat ya! {e} Yang paling banyak disukai dibangun lebih dulu, jadi ajak teman-temanmu like komen ini 👍',
-  '@{u} {b} masuk daftar usulan! {e} Pantau terus desa ini, siapa tahu besok yang dibangun usulanmu 🙌',
-  '@{u} oke, {b} dicatat Mayor Budi. {e} Makin banyak like, makin besar peluangnya dibangun duluan 👷',
-  '@{u} siap, {b} sudah masuk catatan Mayor Budi {e} Tunggu update desa tiap malam ya! 📝',
-  '@{u} makasih usulannya! {e} {b} tercatat, nantikan update desa selanjutnya ya 🙏',
-  '@{u} tercatat ya, {b} masuk daftar! {e} Terima kasih sudah ikut membangun desa 🏘️',
+  '@{u} {b}nya masuk daftar usulan ya {e} nanti kita lihat likes-nya',
+  '@{u} wah {b}, boleh juga nih {e} dicatat dulu ya, yang likes-nya paling banyak yang dibangun duluan',
+  '@{u} noted! {b} masuk list {e} makin banyak yang like komenmu, makin gede peluangnya',
+  '@{u} oke {b} ya {e} Mayor Budi catat. ajak teman buat like komen ini biar cepet dibangun 😄',
+  '@{u} {b}? setuju sih {e} udah masuk catatan. pantengin terus ya',
+  '@{u} {e} {b} udah dicatat. siapa tahu besok kebangun, hehe',
+  '@{u} makasih usulannya! {b} masuk antrean {e}',
+  '@{u} hmm {b} ya, seru juga {e} kita lihat nanti hasil likes-nya',
+  '@{u} {b} dicatat! {e} kalau banyak yang setuju bisa langsung jadi nih 🙌',
+  '@{u} boleh banget {b} {e} tinggal tunggu dukungan likes dari warga lain',
+  '@{u} {e} catat ya Mayor, {b}! makasih udah kasih ide',
+  '@{u} ide {b}nya lucu {e} masuk daftar ya, update desa tiap malam',
 ];
 const T_NOBUILD = [     // permintaan di luar pilihan: cukup dicatat, tidak menjanjikan
-  '@{u} {e} makasih usulannya! Sudah dicatat ya 🙏',
-  '@{u} {e} usulannya menarik, dicatat dulu ya! Terima kasih 🙌',
-  '@{u} {e} tercatat ya! Makasih sudah kasih usulan buat desa ini 📝',
-  '@{u} {e} terima kasih usulannya, sudah masuk catatan Mayor Budi 👷',
-  '@{u} {e} ide bagus, dicatat dulu ya. Makasih udah ikut meramaikan desa! ✨',
-  '@{u} {e} makasih ya, usulanmu tercatat! Pantau terus update desa tiap malam 🏘️',
+  '@{u} {e} dicatat dulu ya, makasih idenya!',
+  '@{u} hehe menarik {e} masuk catatan Mayor Budi',
+  '@{u} {e} noted! belum tentu langsung jadi, tapi dicatat kok',
+  '@{u} wah ide bagus {e} makasih ya udah kasih usulan',
+  '@{u} {e} oke, kita simpen dulu idenya ya',
+  '@{u} makasih {e} usulanmu udah tercatat, pantengin terus desanya',
+  '@{u} {e} boleh juga nih, dicatat!',
+  '@{u} siap {e} nanti Mayor Budi pertimbangkan ya',
 ];
-const T_WELCOME = [     // sapaan, emoji, "sudah follow", dll -> ajak pilih job (Day 4)
-  '@{u} makasih ya! {e} Sekarang kamu warga desa ini 🏡 Pilih jobmu: komen KNIGHT, MAGE, atau RANGER ⚔️',
-  '@{u} halo warga! {e} Perang besar akan datang, pilih jobmu dulu ya: KNIGHT, MAGE, atau RANGER 🛡️',
-  '@{u} selamat datang di desa! {e} Komen jobmu sekarang: KNIGHT, MAGE, atau RANGER ⚔️',
-  '@{u} terima kasih sudah jadi warga! {e} Mau jadi apa saat perang? Komen KNIGHT, MAGE, atau RANGER 🏹',
+const T_WELCOME = [     // sapaan, emoji, "sudah follow", dll -> ajak pilih job
+  '@{u} makasih ya {e} sekarang kamu warga sini 🏡',
+  '@{u} halo warga baru {e} selamat datang di desa!',
+  '@{u} {e} welcome! rumahmu udah disiapin 🏡',
+  '@{u} wah makasih udah gabung {e}',
+  '@{u} {e} hai hai, selamat datang di desa 🙌',
+  '@{u} senang kamu ikut {e} sekarang resmi jadi warga',
+  '@{u} {e} makasih udah mampir dan follow ya!',
+  '@{u} halo {e} sekarang kamu bagian desa ini 🏘️',
 ];
 const T_SORRY = [       // komentar kecewa / merasa tidak dianggap
-  '@{u} maaf ya, kamu tidak dicuekin kok! 🥺 Komenmu sudah terbaca. Pilih jobmu: KNIGHT, MAGE, atau RANGER 🙏',
-  '@{u} waduh, maaf banget! 🥺 Sekarang sudah terbaca kok. Tulis jobmu ya: KNIGHT, MAGE, atau RANGER 🙏',
-  '@{u} maaf ya kalau sempat kelewat 😢 Sekarang sudah terbaca! Komen jobmu: KNIGHT, MAGE, atau RANGER 💪',
+  '@{u} eh maaf ya, bukan dicuekin kok 🥺 komenmu udah kebaca sekarang',
+  '@{u} waduh sorry banget 🙏 kelewat tadi, sekarang udah kebaca ya',
+  '@{u} maaf ya kalau sempat kelewat 😅 sekarang udah dibaca kok',
+  '@{u} sorry ya, komenmu banyak yang masuk jadi telat 🥺 sekarang udah kebaca',
 ];
 const T_JOB = {         // pilihan job (Day 4): {j} = nama job
   KNIGHT: [
-    '@{u} siap, kamu tercatat jadi KNIGHT! 🛡️ Garis depan desa ini sekarang punya kamu ⚔️',
-    '@{u} KNIGHT dicatat Mayor Budi! 🛡️ Siap jadi tameng desa saat perang besar ⚔️',
-    '@{u} oke, jobmu KNIGHT! ⚔️ Pedang dan perisai menunggu kamu 🛡️',
+    '@{u} oke KNIGHT dicatat! 🛡️',
+    '@{u} siap, jadi KNIGHT ya ⚔️ garis depan butuh kamu',
+    '@{u} KNIGHT! 🛡️ mantap, udah tercatat',
+    '@{u} noted, kamu KNIGHT sekarang ⚔️',
+    '@{u} wah KNIGHT, cocok banget jadi tameng desa 🛡️',
+    '@{u} KNIGHT udah aman di catatan 🛡️ ditunggu pas perang',
   ],
   MAGE: [
-    '@{u} siap, kamu tercatat jadi MAGE! 🔮 Sihirmu ditunggu saat perang besar ✨',
-    '@{u} MAGE dicatat Mayor Budi! 🪄 Siap jadi penyihir desa ini ✨',
-    '@{u} oke, jobmu MAGE! 🔮 Tongkat sihirmu sudah disiapkan 🪄',
+    '@{u} oke MAGE dicatat! 🔮',
+    '@{u} siap, jadi MAGE ya ✨',
+    '@{u} MAGE! 🪄 mantap, udah tercatat',
+    '@{u} noted, kamu MAGE sekarang 🔮',
+    '@{u} wah MAGE, sihirnya ditunggu pas perang ✨',
+    '@{u} MAGE udah aman di catatan 🪄',
   ],
   RANGER: [
-    '@{u} siap, kamu tercatat jadi RANGER! 🏹 Panahmu ditunggu saat perang besar 🎯',
-    '@{u} RANGER dicatat Mayor Budi! 🏹 Siap jadi pemanah desa ini 🎯',
-    '@{u} oke, jobmu RANGER! 🎯 Busur dan panah sudah disiapkan 🏹',
+    '@{u} oke RANGER dicatat! 🏹',
+    '@{u} siap, jadi RANGER ya 🎯',
+    '@{u} RANGER! 🏹 mantap, udah tercatat',
+    '@{u} noted, kamu RANGER sekarang 🎯',
+    '@{u} wah RANGER, panahnya ditunggu pas perang 🏹',
+    '@{u} RANGER udah aman di catatan 🎯',
   ],
 };
 const JOB_NAME = { KNIGHT: 'KNIGHT 🛡️', MAGE: 'MAGE 🔮', RANGER: 'RANGER 🏹' };
 const T_JOBBUILD = [    // komentar berisi job DAN permintaan bangunan
-  '@{u} {j} tercatat! Usulan {b} juga masuk daftar Mayor Budi {e} Terima kasih ya 🙌',
-  '@{u} siap, jobmu {j} dan usulan {b} sudah dicatat {e} Pantau update desa ya 📝',
-  '@{u} dua-duanya tercatat: {j} dan usulan {b} {e} Makasih sudah ikut ramaikan desa 🏘️',
+  '@{u} {j} dicatat, usulan {b} juga masuk {e}',
+  '@{u} siap! jadi {j}, dan {b} masuk daftar usulan {e}',
+  '@{u} dua-duanya noted: {j} + {b} {e}',
+  '@{u} {e} {j} aman, {b}nya juga dicatat ya',
+  '@{u} oke {j}! usulan {b}nya Mayor Budi catat {e}',
 ];
 const T_WELCOME_DONE = [   // untuk yang SUDAH memilih job: tidak disuruh pilih lagi
-  '@{u} makasih ya! {e} Jobmu sudah tercatat, tinggal tunggu perang besar 🏡',
-  '@{u} halo warga! {e} Jobmu sudah aman di catatan Mayor Budi. Ajak temanmu gabung ya 🙌',
-  '@{u} terima kasih sudah jadi warga! {e} Pantau update desa tiap malam ya 🏘️',
+  '@{u} makasih ya {e} jobmu udah tercatat kok',
+  '@{u} halo lagi {e} tinggal nunggu perang besar nih',
+  '@{u} {e} makasih udah setia mantengin desa',
+  '@{u} wah makasih {e} ajak teman-temanmu gabung juga ya',
+  '@{u} {e} siap, kamu udah aman di catatan',
 ];
 const T_SORRY_DONE = [
-  '@{u} maaf ya, kamu tidak dicuekin kok! 🥺 Komenmu sudah terbaca, jobmu juga sudah tercatat 🙏',
-  '@{u} waduh, maaf banget! 🥺 Sekarang sudah terbaca kok. Terima kasih sudah sabar ya 🙏',
-  '@{u} maaf ya kalau sempat kelewat 😢 Sekarang sudah terbaca, jobmu sudah tercatat 💪',
+  '@{u} eh maaf ya, bukan dicuekin kok 🥺 komenmu udah kebaca, jobmu juga udah tercatat',
+  '@{u} waduh sorry 🙏 kelewat tadi, sekarang udah kebaca. jobmu aman kok',
+  '@{u} maaf ya kalau sempat kelewat 😅 sekarang udah dibaca',
 ];
-const JOB_CTA = ' Pilih jobmu juga: KNIGHT, MAGE, atau RANGER ⚔️';
+const JOB_CTAS = [
+  ' Pilih jobmu juga ya: KNIGHT, MAGE, atau RANGER ⚔️',
+  ' Oh ya, jobmu apa? KNIGHT, MAGE, atau RANGER 🛡️',
+  ' Sekalian komen jobmu ya: KNIGHT / MAGE / RANGER',
+  ' Mau jadi apa pas perang? KNIGHT, MAGE, atau RANGER? 🏹',
+  ' Jangan lupa pilih job: KNIGHT, MAGE, atau RANGER ⚔️',
+  ' Kamu tim KNIGHT, MAGE, atau RANGER nih? 🔮',
+];
 function detectJob(text) {
   const t = String(text);
   const m = t.match(/\b(knight|ksatria|swordman|swordsman|pedang)\b|\b(mage|penyihir|sihir)\b|\b(r[ae]ng+[ae]r|archer|pemanah|panah)\b/i);
@@ -109,14 +142,26 @@ function detectJob(text) {
   return m[1] ? 'KNIGHT' : m[2] ? 'MAGE' : 'RANGER';
 }
 const T_MULTI = [       // satu komentar berisi banyak permintaan
-  '@{u} wah, daftarnya lengkap banget! 😄 Mayor Budi catat semuanya, tapi dibangun satu per satu ya. Terima kasih usulannya 🙌',
-  '@{u} semangat banget usulannya! 🤩 Semua tercatat ya, nanti dibangun bertahap. Makasih 🙏',
-  '@{u} banyak ide bagus nih! 😍 Sudah dicatat semua, tunggu update desa tiap malam ya 📝',
+  '@{u} wah banyak banget idenya 😄 semua dicatat, tapi dibangun satu-satu ya',
+  '@{u} semangat banget nih 🤩 dicatat semua ya, bertahap bangunnya',
+  '@{u} listnya panjang juga hehe 😅 udah masuk catatan semua',
+  '@{u} banyak ide bagus! 😍 Mayor Budi catat semuanya',
+  '@{u} oke oke, semuanya dicatat 📝 tinggal lihat mana yang likes-nya paling banyak',
 ];
 const T_KELUAR = [
-  '@{u} siap, permintaanmu dicatat. Terima kasih sudah mampir ke desa ini 🙏',
-  '@{u} oke, dicatat ya. Makasih sudah mampir, kapan-kapan main lagi 👋',
+  '@{u} oke, dicatat ya. makasih udah mampir 🙏',
+  '@{u} siap. kapan-kapan main lagi ya 👋',
+  '@{u} yah, sayang banget. makasih udah pernah ikut ya 🙏',
 ];
+
+// Sentuhan kecil agar tidak seragam: kadang tanpa emoji di akhir, kadang huruf kecil di awal, dsb. (deterministik dari id)
+function humanize(t, h) {
+  const m = (h >>> 11) % 8;
+  if (m === 0) t = t.replace(/\s*(\p{Extended_Pictographic}\uFE0F?)+\s*$/u, '');      // tanpa emoji penutup
+  else if (m === 1) t = t.replace(/!(?=\s|$)/, '');                                       // tanpa tanda seru
+  else if (m === 2) t = t.replace(/ ya\b/, ' yaa');
+  return t;
+}
 
 function pickReply(c, ctx = {}) {
   const done = !!(ctx.chosen && c.username && ctx.chosen.has(String(c.username).toLowerCase()));   // sudah pilih job
@@ -140,8 +185,10 @@ function pickReply(c, ctx = {}) {
   else if (/\b(bangun|bikin|buat|buatin|dong|minta|tambah)/i.test(text)) { list = T_NOBUILD; e = emojiFor(text, h >>> 3); }
   else { list = done ? T_WELCOME_DONE : T_WELCOME; e = own || pick(['🙌', '😊', '🎉'], h >>> 3); }
   let out = pick(list, h).replace('{u}', c.username).replace('{b}', b).replace('{e}', e);
-  if (!done && [T_BUILD, T_NOBUILD, T_MULTI].includes(list)) out += JOB_CTA;       // Day 4: semua balasan ajak pilih job
-  return out;
+  // Day 4: balasan ajak pilih job, dengan kalimat yang berganti-ganti (dan sesekali dilewati supaya tidak terasa template)
+  const wantsCta = !done && [T_BUILD, T_NOBUILD, T_MULTI, T_WELCOME, T_SORRY].includes(list) && !/KNIGHT|MAGE|RANGER/.test(out);
+  if (wantsCta && (h >>> 5) % 6 !== 0) out += (/[.!?\p{Extended_Pictographic}]\uFE0F?$/u.test(out) ? '' : '.') + pick(JOB_CTAS, h >>> 7);
+  return humanize(out, h);
 }
 
 async function call(method, p, params = {}) {
@@ -201,7 +248,7 @@ async function main() {
       if (e.code === 4 || e.code === 17 || e.code === 32 || e.code === 613) { console.log('Batas laju API tercapai, berhenti.'); break; }
       done.add(c.id); // jangan coba ulang komentar yang ditolak (mis. sudah dihapus)
     }
-    await sleep(4000);
+    await sleep(3000 + Math.floor(Math.random() * 7000));     // jeda acak 3-10 detik, seperti orang mengetik
   }
   if (!DRY) fs.writeFileSync(FILE, JSON.stringify({ ids: [...done].slice(-5000), day: today, count: countToday }));
   console.log(`Selesai. Terkirim: ${sent}.`);

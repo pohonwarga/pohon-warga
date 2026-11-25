@@ -2,4 +2,14 @@
 <title>Kastil Pohon Warga</title>
 <style>html,body{margin:0;height:100%;background:#1b1530;overflow:hidden}canvas{display:block}</style>
 <script type="importmap">{"imports":{"three":"../lib/three/build/three.module.js","three/addons/":"../lib/three/examples/jsm/"}}</script>
-</head><body><script type="module" src="castle.js"></script></body></html>
+</head><body><style>
+#ld{position:fixed;inset:0;z-index:99;background:#1b1030 url(loading_wide.jpg) center/cover no-repeat;color:#ffd23a;font-family:Inter,Arial,sans-serif;transition:opacity .6s}
+@media (max-aspect-ratio:1/1){#ld{background-image:url(loading_tall.jpg)}}
+#ld .t{position:absolute;top:7%;left:0;right:0;text-align:center;font-weight:900;font-size:clamp(34px,7vw,84px);letter-spacing:1px;color:#ffd23a;-webkit-text-stroke:clamp(5px,1vw,11px) #2a1148;paint-order:stroke fill;text-shadow:0 6px 0 #2a1148}
+#ld .s{position:absolute;top:calc(7% + clamp(46px,9vw,108px));left:0;right:0;text-align:center;font-weight:700;font-size:clamp(13px,2vw,22px);color:#fff;text-shadow:0 2px 6px #000}
+#ld .b{position:absolute;left:50%;bottom:11%;transform:translateX(-50%);width:min(520px,72vw);height:20px;border-radius:12px;background:rgba(27,16,48,.75);border:3px solid #2a1148;overflow:hidden}
+#ld .b i{display:block;height:100%;width:0;background:linear-gradient(#ffe36a,#ffb21f);transition:width .25s}
+#ld .p{position:absolute;left:0;right:0;bottom:calc(11% + 34px);text-align:center;font-weight:900;font-size:clamp(20px,3vw,34px);-webkit-text-stroke:6px #2a1148;paint-order:stroke fill;color:#ffd23a}
+</style>
+<div id="ld"><div class="t">POHON WARGA</div><div class="s">memuat kota…</div><div class="p" id="ldp">0%</div><div class="b"><i id="ldb"></i></div></div>
+<script type="module" src="castle.js"></script></body></html>

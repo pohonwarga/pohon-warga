@@ -254,6 +254,10 @@ const inMap = (x, z, m = 1.3) => { const r = z / 1.7320508, q = (x - r) / 2; ret
 // ---------- POHON BESAR (ikon) ----------
 
 
+// Tahap build: bar tetap naik pelan (sampai 99%) selama scene disusun, supaya tidak terlihat beku
+{ const sEl = document.querySelector('#ld .s'); if (sEl) sEl.textContent = 'membangun desa…';
+  const pEl = document.getElementById('ldp'), bEl = document.getElementById('ldb'); let v = LDP.m;
+  window.BUILD_T = setInterval(() => { v = Math.min(99, v + (99 - v) * 0.05 + 0.1); const n = Math.floor(v); if (pEl) pEl.textContent = n + '%'; if (bEl) bEl.style.width = n + '%'; }, 250); }
 await flushBatches();
 houseSlots.slice(0, nHouse).forEach(h => blob(h.x, h.z, 0.8, 0.9));
 (window.TOWERS || []).forEach(([x, z]) => blob(x, z, 1.0, 0.9));
@@ -728,7 +732,7 @@ if (!LIVE) {
     renderer.render(scene, camera);
   };
   window.renderFrame(T0); window.renderFrame(T0);
-  {const e = document.getElementById('ldp'), b = document.getElementById('ldb'); if (e) e.textContent = '100%'; if (b) b.style.width = '100%'; const l = document.getElementById('ld'); if (l) { l.style.opacity = 0; setTimeout(() => l.remove(), 700); }} window.READY = 1; window.DBG = {BUDI, THREE, scene, PORTAL};
+  clearInterval(window.BUILD_T); {const e = document.getElementById('ldp'), b = document.getElementById('ldb'); if (e) e.textContent = '100%'; if (b) b.style.width = '100%'; const l = document.getElementById('ld'); if (l) { l.style.opacity = 0; setTimeout(() => l.remove(), 700); }} window.READY = 1; window.DBG = {BUDI, THREE, scene, PORTAL};
 } else {
   // ---------- mode interaktif (website) ----------
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -951,5 +955,5 @@ if (!LIVE) {
     if (BUDI) { if (camKey === 'budi' && !tween) { _v.subVectors(BUDI.g.position, lastB); camera.position.add(_v); controls.target.add(_v); } lastB.copy(BUDI.g.position); }
     controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop);
   })();
-  {const e = document.getElementById('ldp'), b = document.getElementById('ldb'); if (e) e.textContent = '100%'; if (b) b.style.width = '100%'; const l = document.getElementById('ld'); if (l) { l.style.opacity = 0; setTimeout(() => l.remove(), 700); }} window.READY = 1; window.DBG = {BUDI, THREE, scene, PORTAL};
+  clearInterval(window.BUILD_T); {const e = document.getElementById('ldp'), b = document.getElementById('ldb'); if (e) e.textContent = '100%'; if (b) b.style.width = '100%'; const l = document.getElementById('ld'); if (l) { l.style.opacity = 0; setTimeout(() => l.remove(), 700); }} window.READY = 1; window.DBG = {BUDI, THREE, scene, PORTAL};
 }

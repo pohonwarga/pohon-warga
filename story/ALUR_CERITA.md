@@ -36,3 +36,26 @@ Aturan drama: warga ber-username tidak pernah mati (paling jauh terluka, dirawat
 - Urutan: naskah VO ber-tag (30-35 detik) -> preview gambar final tiap scene -> setuju -> baru render.
 - Selalu tampilkan jumlah like usulan teratas. Jangan kirim screenshot untuk cek viewer; push langsung.
 - Footage hari ini sudah dibuat Arifin sendiri; jangan buat prompt Veo baru kecuali diminta.
+
+## FORMAT HOOK HARIAN (dikunci 26 Nov, Day 6) - dipakai SETIAP hari
+Alasan: views turun, Day 6 lama membosankan (buka dengan teks di atas gambar diam, tanpa suara).
+Rumus 0-3 detik, referensi: kinetic "99." (hantam masuk -> mengecil blur -> kalimat per kata):
+1. 0,0-0,5 dtk: BUNYI dulu, layar gelap (auman / dentang pedang / terompet).
+2. 0,5-1,5 dtk: satu kata atau angka besar dihantam masuk (caps kuning, outline ungu tua; gaya Day 3-5 tidak berubah).
+3. 1,5-3 dtk: kata itu mundur, blur, naik ke atas (opacity 25%); kalimat kedua muncul per kata (putih tipis, 1 kata kunci glow). Baru potong ke footage.
+4. Akhir video: bunyi yang sama diulang, langsung loop ke detik 0.
+Detail animasi: masuk skala 140%->100% dalam 4 frame + motion blur + getar 6 px 0,2 dtk; keluar 60%, blur 12 px, opacity 25%, geser ke atas; per kata jeda 0,08 dtk naik 20 px + fade; angka menghitung naik, easing melambat, pop 110%; stempel miring -8 derajat masuk 200%->100% + debu; pindah scene kilat putih 2 frame + zoom-punch 105%.
+SFX (ElevenLabs Sound Effects): "deep dragon roar echoing from inside a magical portal, distant, reverb, low rumble, 2 seconds"; "low earthquake rumble with magical whoosh, 1 second"; "heavy impact hit, cinematic".
+Hindari: daftar username panjang di tengah video (orang yang tidak kenal namanya scroll); cukup 2 chip + angka.
+
+## Day 6 STRUKTUR BARU (menggantikan versi lama; cerita TIDAK berubah, auman = bocoran Ibu Naga di balik portal untuk Day 7 opsi B)
+0-1,5 dtk hitam + retakan ungu, "DENGAR ITU?" dihantam | 1,5-4 "ada yang mengaum dari dalam PORTAL" (portal glow ungu) | 4-9 footage bayi naga menangis (5 dtk pertama Veo), "BAYI NAGA", "IBUNYA KE MANA?" huruf per huruf | 9-13 footage Sekolah Mage, hati 0->3, stempel "RESMI DIBANGUN" | 13-17 footage kota baru, hitung 284->291, 2 chip nama, stempel "SISA 9" | 17-26 A/B: kartu A KNIGHT dari kiri, B MAGE dari kanan, kilat | 26-30 hitam, "9." raksasa, "warga lagi... PERANG.", auman diulang.
+VO baru (~56 kata, 30 dtk):
+[whispers] Dengar itu?
+[dramatic] Ada yang mengaum dari dalam portal!
+[sad] Bayi naga langsung menangis. [whispers] Ibunya ke mana?
+[excited] Usul terpopuler dari @mas.brayennn, 3 like: Sekolah Mage resmi dibangun!
+[warmly] 7 warga baru! @sriwulandari60887, @tadano_nabigeta, cari namamu!
+[excited] Malam ini, siapa jaga bayi naga? A: Knight jaga portal. B: Mage selidiki portal. Komen A atau B!
+[dramatic] Follow, dapat rumah. Sisa 9 warga... perang dimulai.
+Cek dulu: angka 291 dan "sisa 9" vs jumlah follower saat rekam. Status: MENUNGGU "setuju" Arifin; pipeline belum diubah, belum ada render.

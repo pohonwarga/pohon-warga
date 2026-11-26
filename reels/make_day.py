@@ -34,7 +34,9 @@ def get_day(n):
     if not rec: sys.exit(f'Hari {n} tidak ada di {DAYS}')
     return rec[0]
 
-def scene_bg(d):
+def scene_bg(d, key=None):
+    k = ROOT / 'reels' / 'assets' / f'day{d["day"]}' / f'bg_{key}.png'
+    if key and k.exists(): return load(k)
     p = ROOT / 'site' / 'data' / f'shot_day{d["day"]}.png'          # rekaman viewer hari itu (jika ada)
     fallback = Path(__file__).resolve().parent / 'assets' / 'day5' / 'c_wide_full.png'
     return load(p if p.exists() else fallback)
@@ -44,24 +46,24 @@ def build_scenes(d, names, drama, n):
     usul = d.get('usul_teratas') or {}
     user, likes = usul.get('user', '-'), int(usul.get('likes', 0))
     bname = (usul.get('text') or 'USULAN').upper()[:40]
-    im = dim(scene_bg(d), .35); hl(im, drama['hook'].upper(), y=520, size=96); out['1_hook'] = im
-    im = dim(scene_bg(d), .2); y = hl(im, 'KALIAN YANG PILIH!', y=270, size=96)
+    im = dim(scene_bg(d, 'drama'), .35); hl(im, drama['hook'].upper(), y=520, size=96); out['1_hook'] = im
+    im = dim(scene_bg(d, 'vote'), .2); y = hl(im, 'KALIAN YANG PILIH!', y=270, size=96)
     grid(im, [(f'@{user} · {likes} LIKE', 'o'), (bname, 'y')], y + 40, cols=1, pw=700, ph=92, size=40)
     out['2_vote'] = im
     pages = [names[i:i + PER_PAGE] for i in range(0, len(names), PER_PAGE)] or [[]]
     cols = ['p', 'y', 'g', 'o']
     for pi, pg in enumerate(pages[:3], 1):      # maks 3 halaman, sama seperti Day 5
-        im = dim(scene_bg(d), .2); y = hl(im, f'+{len(names)} WARGA BARU! ({pi}/{len(pages)})', y=280, size=84)
+        im = dim(scene_bg(d, 'kota'), .2); y = hl(im, f'+{len(names)} WARGA BARU!' + (f' ({pi}/{len(pages)})' if len(pages) > 1 else ''), y=280, size=84)
         grid(im, [('@' + nm, cols[(i // 2 + i % 2) % 4]) for i, nm in enumerate(pg)], y + 30, pw=405, ph=68, gap=10, size=28)
         out[f'3_warga_{pi}'] = im
-    im = dim(scene_bg(d), .4); y = hl(im, drama['drama1'].upper(), y=520, size=88)
+    im = dim(scene_bg(d, 'drama'), .4); y = hl(im, drama['drama1'].upper(), y=520, size=88)
     hl(im, drama['drama2'].upper(), y=y + 120, size=88); out['4_drama'] = im
-    im = dim(scene_bg(d), .3); y = hl(im, 'KOMEN A ATAU B!', y=300, size=96)
+    im = dim(scene_bg(d, 'drama'), .3); y = hl(im, 'KOMEN A ATAU B!', y=300, size=96)
     grid(im, [('A: ' + drama['pilihan_a'], 'g'), ('B: ' + drama['pilihan_b'], 'o')], y + 40, cols=1, pw=760, ph=100, size=40)
     out['5_pilihan'] = im
-    im = dim(scene_bg(d), .35); y = hl(im, 'JADI WARGA!', y=260, size=110)
+    im = dim(scene_bg(d, 'kota2'), .35); y = hl(im, 'JADI WARGA!', y=260, size=110)
     grid(im, [('FOLLOW = DAPAT RUMAH', 'y'), ('KOMEN = GANTI JOB', 'p'), ('KOMEN = REQUEST BANGUNAN', 'g'), ('LIKES TERBANYAK = DIBANGUN!', 'o')], y + 40, cols=1, pw=820, ph=100, size=36)
-    c = brand.counter_img(n, GOAL); im.paste(c.convert('RGB'), (40, 300), c)
+    c = brand.counter_img(n, GOAL); im.paste(c.convert('RGB'), ((1080 - 340) // 2, 1360), c)
     out['6_cta'] = im
     return out, pages, usul
 
@@ -96,9 +98,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--day', type=int, required=True)
     ap.add_argument('--followers', required=True, help='file teks, satu username per baris')
+    ap.add_argument('--usul', help='timpa usulan teratas: user|teks|likes|building')
     ap.add_argument('--drama', help='JSON: hook, drama1, drama2, pilihan_a, pilihan_b')
     a = ap.parse_args()
     d = get_day(a.day); names = load_followers(a.followers)
+    if a.usul:
+        u, t, l = a.usul.split('|')[:3]; d['usul_teratas'] = {'user': u, 'text': t, 'likes': int(l)}
     drama = dict(DEFAULT_DRAMA)
     if a.drama: drama.update(json.loads(Path(a.drama).read_text(encoding='utf8')))
     n = int(d.get('stats', {}).get('population', 0))

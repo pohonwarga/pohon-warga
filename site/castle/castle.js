@@ -205,7 +205,7 @@ function blob(x, z, r, op = 1, parent = scene, y = 0.03) { const m = new THREE.M
   const [bx0, bz0] = XZ(...FEAT.balai); put('building_home_B_red', bx0, 0, bz0, Math.atan2(-bx0, -bz0), 1.55); put('flag_yellow', bx0 + 1.0, 0, bz0 + 0.6, 0, 1); put('flag_yellow', bx0 - 1.0, 0, bz0 + 0.6, 0, 1);
   const [bx, bz] = XZ(...FEAT.barracks); put('building_barracks_red', bx, 0, bz, Math.atan2(-bx, -bz), 1);
   const [ax, az] = ARCH; put('building_archeryrange_yellow', ax, 0, az, Math.atan2(-ax, -az), 1); put('target', ax + 0.9, 0, az + 0.5, -0.6, 1);
-  const [mx, mz] = [6.5, 1.5]; put('building_church_blue_nocross', mx, 0, mz, Math.atan2(-mx, -mz), 1);   // SEKOLAH MAGE (usulan @mas.brayennn, 3 like); gereja biru tanpa salib
+  const [mx, mz] = [6.9, 1.95]; put('building_church_blue_nocross', mx, 0, mz, Math.atan2(-mx, -mz), 1);   // SEKOLAH MAGE (usulan @mas.brayennn, 3 like); gereja biru tanpa salib
 }
 
 // ---------- pohon: pak Low Poly Forest (Devilswork) — sedikit di dalam, hutan kecil di ujung peta ----------
@@ -341,6 +341,35 @@ const PORTAL = grp(-3.55, 0, 1.5); window.PORTAL = PORTAL;
     tendrils.forEach((tb, k) => { tb.rotation.z = Math.sin(t * 0.9 + k * 1.3) * 0.06; });
     const p = eg.attributes.position; for (let k = 0; k < EN; k++) { let y = p.getY(k) + ev[k] * dt; if (y > 2.8) y = 0; p.setY(k, y); p.setX(k, p.getX(k) + Math.sin(t * 1.3 + eph[k]) * 0.002); } p.needsUpdate = true;
     pl.intensity = 5 + Math.sin(t * 3) * 1.2;
+  });
+}
+
+// ---------- BAYI NAGA (Day 6): duduk menangis menghadap portal ----------
+{
+  const D = grp(-2.75, 0, 2.85); D.rotation.y = 0.5 + Math.PI; window.BABYDRAGON = D;
+  const pm = mat(0x8a4fe0, {flatShading: true}), bm = mat(0xd8b8ff, {flatShading: true}), hm = mat(0xffd24a, {flatShading: true}), em = mat(0x1a0f2e), wm = mat(0xb07cf0, {flatShading: true, side: THREE.DoubleSide});
+  const body = add(D, new THREE.IcosahedronGeometry(0.34, 1), pm, 0, 0.34, 0); body.scale.set(1, 0.95, 1.15);
+  add(D, new THREE.IcosahedronGeometry(0.26, 1), bm, 0, 0.3, 0.17).scale.set(0.9, 1, 0.8);
+  const head = grp(0, 0.78, 0.2); D.add(head);
+  add(head, new THREE.IcosahedronGeometry(0.24, 1), pm, 0, 0, 0);
+  add(head, new THREE.IcosahedronGeometry(0.13, 0), pm, 0, -0.06, 0.2).scale.set(1.1, 0.8, 1.2);
+  [-1, 1].forEach(sx => {
+    add(head, new THREE.SphereGeometry(0.055, 8, 6), em, sx * 0.11, 0.04, 0.2);
+    const h = add(head, new THREE.ConeGeometry(0.05, 0.2, 5), hm, sx * 0.13, 0.25, -0.02); h.rotation.z = -sx * 0.35;
+    const tear = add(head, new THREE.SphereGeometry(0.03, 6, 5), mat(0x6ad0ff, {emissive: 0x2a90d0, emissiveIntensity: 0.6}), sx * 0.15, -0.04, 0.24); tear.scale.set(0.8, 1.3, 0.8); tear.castShadow = false;
+    add(D, new THREE.IcosahedronGeometry(0.1, 0), pm, sx * 0.24, 0.12, 0.28).scale.set(0.8, 0.7, 1.4);
+    const wing = new THREE.Mesh(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(sx * 0.55, 0.38, -0.1), new THREE.Vector3(sx * 0.38, -0.1, -0.12)]), wm);
+    wing.geometry.computeVertexNormals(); wing.position.set(sx * 0.2, 0.55, -0.18); wing.castShadow = true; D.add(wing); wing.userData.sx = sx; D.userData.wings = (D.userData.wings || []).concat(wing);
+  });
+  const tail = grp(0, 0.2, -0.32); D.add(tail);
+  for (let i = 0; i < 4; i++) { const sg2 = add(tail, new THREE.ConeGeometry(0.15 - i * 0.03, 0.3, 6), pm, 0, 0, -i * 0.24); sg2.rotation.x = -Math.PI / 2; sg2.position.y = i * 0.025; }
+  for (let i = 0; i < 4; i++) add(D, new THREE.ConeGeometry(0.05, 0.12, 4), hm, 0, 0.66 - i * 0.12, -0.2 - i * 0.11).rotation.x = -0.6;
+  animFns.push(t => {
+    const k = Math.sin(t * 5.5); const sob = Math.max(0, k);
+    body.scale.y = 0.95 + sob * 0.05; D.position.y = sob * 0.012;
+    head.rotation.x = 0.35 + sob * 0.08; head.rotation.z = Math.sin(t * 0.8) * 0.06;
+    tail.rotation.y = Math.sin(t * 1.3) * 0.35;
+    D.userData.wings.forEach(w => { w.rotation.z = w.userData.sx * (0.15 + sob * 0.12); });
   });
 }
 
@@ -643,7 +672,7 @@ if (LABELS) {
   sign('KEBUN WARGA', null, KEB[0] + 1.12, KEB[1] + 0.65, 1.05);
   { const [kx, kz] = XZ(...FEAT.barracks); sg('MARKAS KNIGHT', null, kx, kz, 1.25); }
   sg('MARKAS RANGER', null, ARCH[0], ARCH[1], 1.2);
-  { const [mx, mz] = [6.5, 1.5]; sg('SEKOLAH MAGE', 'Usulan @mas.brayennn', mx, mz, 1.2); }
+  { const [mx, mz] = [6.9, 1.95]; sg('SEKOLAH MAGE', 'Usulan @mas.brayennn', mx, mz, 1.2); }
 }
 
 // ---------- cahaya & kamera ----------

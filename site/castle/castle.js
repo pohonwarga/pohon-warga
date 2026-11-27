@@ -206,6 +206,7 @@ function blob(x, z, r, op = 1, parent = scene, y = 0.03) { const m = new THREE.M
   const [bx, bz] = XZ(...FEAT.barracks); put('building_barracks_red', bx, 0, bz, Math.atan2(-bx, -bz), 1);
   const [ax, az] = ARCH; put('building_archeryrange_yellow', ax, 0, az, Math.atan2(-ax, -az), 1); put('target', ax + 0.9, 0, az + 0.5, -0.6, 1);
   const [mx, mz] = [6.9, 1.95]; put('building_church_blue_nocross', mx, 0, mz, Math.atan2(-mx, -mz), 1);   // SEKOLAH MAGE (usulan @mas.brayennn, 3 like); gereja biru tanpa salib
+  const [gx, gz] = [5.4, 3.7]; put('building_blacksmith_red', gx, 0, gz, Math.atan2(-gx, -gz), 1); put('weaponrack', gx + 0.95, 0, gz + 0.35, -0.5, 1);   // GUDANG SENJATA (usulan @xieshn, 2 like)
 }
 
 // ---------- pohon: pak Low Poly Forest (Devilswork) — sedikit di dalam, hutan kecil di ujung peta ----------
@@ -673,6 +674,7 @@ if (LABELS) {
   { const [kx, kz] = XZ(...FEAT.barracks); sg('MARKAS KNIGHT', null, kx, kz, 1.25); }
   sg('MARKAS RANGER', null, ARCH[0], ARCH[1], 1.2);
   { const [mx, mz] = [6.9, 1.95]; sg('SEKOLAH MAGE', 'Usulan @mas.brayennn', mx, mz, 1.2); }
+  { const [gx, gz] = [5.4, 3.7]; sg('GUDANG SENJATA', 'Usulan @xieshn', gx, gz, 1.2); }
 }
 
 // ---------- cahaya & kamera ----------

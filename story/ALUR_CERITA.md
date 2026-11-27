@@ -59,3 +59,14 @@ VO baru (~56 kata, 30 dtk):
 [excited] Malam ini, siapa jaga bayi naga? A: Knight jaga portal. B: Mage selidiki portal. Komen A atau B!
 [dramatic] Follow, dapat rumah. Sisa 9 warga... perang dimulai.
 Cek dulu: angka 291 dan "sisa 9" vs jumlah follower saat rekam. Status: MENUNGGU "setuju" Arifin; pipeline belum diubah, belum ada render.
+
+## KEPUTUSAN 27 Nov 2026 (Arifin sudah setuju; catat dan ikuti)
+Day 7, cabang B (Mage selidiki portal menang):
+- Ibu Naga: naga low-poly oranye-merah (referensi Arifin), rantai berkarat, mata ungu menyala karena pengaruh Necromancer. BUKAN bayi naga ungu yang diperbesar.
+- Necromancer hanya SILUET di akhir ("Serahkan anaknya."). Skeleton Golem TIDAK muncul di Day 7.
+- Klip Veo drama (perkuat footage, mage mengintip) sudah dibuat Arifin; audio Veo dibuang, diganti auman naga (dragon-studio-epic-dragon-roar-364481.mp3) + SFX.
+Format harian (berlaku tiap hari, bisa dipakai terus):
+- SATU ajakan utama per video: A/B. Request bangunan diturunkan jadi chip kecil usulan teratas (tetap tampilkan LIKES) + satu baris di caption.
+- Scene 2 (hasil): judul "SUARA KALIAN MENANG!" + subjudul "terima kasih telah berpartisipasi"; pill hijau pilihan yang menang + pill jumlah vote; username SEMUA yang komen, ukuran kecil, grid 3 kolom, muncul bergantian cepat (pop berurutan ~0,04 dtk). Maks 24 nama, sisanya "+ N DAN YANG LAINNYA". Username terpotong boleh. Durasi scene tidak berubah.
+- Scene 3 (warga baru): SEMUA follower baru punya nama di visual (halaman 24 nama, berganti cepat), nama TIDAK dibacakan di VO. VO hanya: "N warga baru! Cari namamu di layar!"
+- Scene 5 (pilihan): kartu A/B split kiri-kanan, footage viewer masing-masing di tengah, huruf A/B di atas panel, label di bawah (pill ungu dan kuning), background gambar naga+Necromancer dari Arifin. Tanpa penghitung 291/300 di kartu ini.

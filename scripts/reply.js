@@ -143,6 +143,28 @@ const T_MULTI = [       // satu komentar berisi banyak permintaan
   '@{u} banyak ide bagus! 😍 Mayor Budi catat semuanya',
   '@{u} oke oke, semuanya dicatat 📝 tinggal lihat mana yang likes-nya paling banyak',
 ];
+// Vote Day 6: A = Knight jaga portal, B = Mage selidiki portal. Dicek sebelum deteksi job (kata "knight"/"mage" di vote tetap dihitung sebagai vote).
+const T_VOTE_A = [
+  '@{u} makasih, saya udah catat pilihan A ya 🛡️',
+  '@{u} oke, A sudah saya catat. Knight jaga portal 🛡️',
+  '@{u} siap, pilihan A tercatat ya ⚔️ makasih udah ikut vote',
+  '@{u} makasih ya, A sudah saya catat 🛡️',
+  '@{u} A tercatat! makasih udah ikut milih 🙌',
+];
+const T_VOTE_B = [
+  '@{u} makasih, saya udah catat pilihan B ya 🔮',
+  '@{u} oke, B sudah saya catat. Mage selidiki portal 🔮',
+  '@{u} siap, pilihan B tercatat ya ✨ makasih udah ikut vote',
+  '@{u} makasih ya, B sudah saya catat 🔮',
+  '@{u} B tercatat! makasih udah ikut milih 🙌',
+];
+function detectVote(text) {
+  const t = String(text).trim();
+  if (/^[ab]\s*(kak|kk|min|bang|bg|om|dong|nih)?\s*[!.]*\s*(\p{Extended_Pictographic}\uFE0F?\s*)*$/iu.test(t)) return t[0].toUpperCase();
+  if (/\b(knight|ksatria)\b.*\bjaga\b|\bjaga\b.*\bportal\b/i.test(t)) return 'A';
+  if (/\b(mage|penyihir)\b.*\bselidiki\b|\bselidiki\b.*\bportal\b/i.test(t)) return 'B';
+  return null;
+}
 const T_KELUAR = [
   '@{u} oke, dicatat ya. makasih udah mampir 🙏',
   '@{u} siap. kapan-kapan main lagi ya 👋',
@@ -166,6 +188,8 @@ function pickReply(c, ctx = {}) {
   const own = (text.match(/\p{Extended_Pictographic}/u) || [])[0];       // emoji yang dipakai si pengomentar
   const items = text.split(/,|\bsama\b|\bdan\b|\bserta\b/i).filter(x => x.trim().length > 2).length;
   const buildable = /rumah sakit|rumah ibadah/i.test(text) ? null : parseBuild(text);  // "rumah sakit" bukan "rumah"
+  const vote = detectVote(text);
+  if (vote) return humanize(pick(vote === 'A' ? T_VOTE_A : T_VOTE_B, h).replace('{u}', c.username), h);
   const job = detectJob(text);
   if (job) {
     const bd = /rumah sakit|rumah ibadah/i.test(text) ? null : parseBuild(text);

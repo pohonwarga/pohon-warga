@@ -60,15 +60,15 @@ const T_NOBUILD = [     // permintaan di luar pilihan: cukup dicatat, tidak menj
   '@{u} siap {e} makasih, saya udah catat ya',
   '@{u} {e} makasih idenya, saya catat ya',
 ];
-const T_WELCOME = [     // sapaan, emoji, "sudah follow", dll -> ajak pilih job
-  '@{u} makasih, saya udah catat ya! {e} kamu sekarang warga desa ini 🏡',
-  '@{u} makasih ya {e} sudah saya catat, selamat datang di desa!',
-  '@{u} halo warga baru {e} makasih, saya udah catat ya',
-  '@{u} makasih udah gabung {e} saya udah catat kok',
-  '@{u} {e} makasih ya, sudah saya catat. selamat datang di desa 🙌',
-  '@{u} senang kamu ikut {e} makasih, saya udah catat',
-  '@{u} makasih udah mampir dan follow {e} saya catat ya',
-  '@{u} halo {e} makasih ya, kamu sudah saya catat sebagai warga',
+const T_WELCOME = [     // sapaan, emoji, "sudah follow", dll (Day 8: konteks persiapan perang)
+  '@{u} halo warga baru {e} pas banget masuknya, lagi mau perang nih',
+  '@{u} selamat datang {e} Selasa kita perang rame-rame ya',
+  '@{u} makasih udah gabung {e} masuknya pas lagi seru-serunya 😄',
+  '@{u} {e} welcome! doain pasukan kita kuat ya',
+  '@{u} hai {e} makasih ya, desanya makin rame nih',
+  '@{u} senang kamu ikut {e} Selasa jangan ketinggalan',
+  '@{u} makasih udah mampir {e} ayo siap-siap bareng',
+  '@{u} {e} selamat datang di desa, sebentar lagi perang lho',
 ];
 const T_SORRY = [       // komentar kecewa / merasa tidak dianggap
   '@{u} eh maaf ya, bukan dicuekin kok 🥺 komenmu udah kebaca sekarang',
@@ -84,6 +84,8 @@ const T_JOB = {         // pilihan job: {j} = nama job
     '@{u} makasih ya, KNIGHT sudah saya catat 🛡️',
     '@{u} KNIGHT tercatat, makasih udah ikut desa ya ⚔️',
     '@{u} makasih, saya udah catat KNIGHT-mu ya 🙌',
+    '@{u} KNIGHT! barisan paling depan nih 🛡️ sampai ketemu Selasa',
+    '@{u} oke KNIGHT, siap jadi tameng pasukan ⚔️',
   ],
   MAGE: [
     '@{u} makasih, saya udah catat ya! MAGE 🔮',
@@ -92,6 +94,8 @@ const T_JOB = {         // pilihan job: {j} = nama job
     '@{u} makasih ya, MAGE sudah saya catat 🪄',
     '@{u} MAGE tercatat, makasih udah ikut desa ya ✨',
     '@{u} makasih, saya udah catat MAGE-mu ya 🙌',
+    '@{u} MAGE! barisan tengah ya 🔮 sampai ketemu Selasa',
+    '@{u} oke MAGE, sihirnya kita tunggu Selasa ✨',
   ],
   RANGER: [
     '@{u} makasih, saya udah catat ya! RANGER 🏹',
@@ -100,6 +104,8 @@ const T_JOB = {         // pilihan job: {j} = nama job
     '@{u} makasih ya, RANGER sudah saya catat 🎯',
     '@{u} RANGER tercatat, makasih udah ikut desa ya 🏹',
     '@{u} makasih, saya udah catat RANGER-mu ya 🙌',
+    '@{u} RANGER! tembak dari barisan belakang ya 🏹 sampai ketemu Selasa',
+    '@{u} oke RANGER, panahnya siap-siap buat Selasa 🎯',
   ],
 };
 const JOB_NAME = { KNIGHT: 'KNIGHT 🛡️', MAGE: 'MAGE 🔮', RANGER: 'RANGER 🏹' };
@@ -110,12 +116,12 @@ const T_JOBBUILD = [    // komentar berisi job DAN permintaan bangunan
   '@{u} makasih! {j} tercatat, {b} juga masuk daftar {e}',
   '@{u} saya udah catat {j} sama {b} ya {e} makasih',
 ];
-const T_WELCOME_DONE = [   // untuk yang SUDAH memilih job: tidak disuruh pilih lagi
-  '@{u} makasih, saya udah catat ya {e} jobmu sudah tercatat kok',
-  '@{u} halo lagi {e} makasih, saya udah catat',
-  '@{u} {e} makasih udah setia mantengin desa, sudah saya catat',
-  '@{u} makasih ya {e} ajak teman-temanmu gabung juga, saya udah catat',
-  '@{u} {e} siap, saya udah catat ya, kamu aman di catatan',
+const T_WELCOME_DONE = [   // untuk yang SUDAH memilih job
+  '@{u} {e} makasih udah setia mantengin, Selasa jangan ketinggalan ya',
+  '@{u} halo lagi {e} siap-siap buat Selasa ya',
+  '@{u} {e} makasih ya, ajak temanmu follow juga biar pasukannya makin banyak',
+  '@{u} wah rajin banget {e} Selasa kita buktiin',
+  '@{u} {e} siap, sampai ketemu di perang Selasa',
 ];
 const T_SORRY_DONE = [
   '@{u} eh maaf ya, bukan dicuekin kok 🥺 komenmu udah kebaca, jobmu juga udah tercatat',
@@ -165,6 +171,53 @@ function detectVote(text) {
   if (/\b(mage|penyihir)\b.*\bselidiki\b|\bselidiki\b.*\bportal\b/i.test(t)) return 'B';
   return null;
 }
+const T_WAR = [         // "siap perang", "gas", "ikut"
+  '@{u} gas! pasukannya makin rame nih ⚔️',
+  '@{u} semangat banget 🔥 Selasa kita lihat hasilnya',
+  '@{u} nah gini dong, warga yang siap perang 😤',
+  '@{u} siap-siap ya, perang hari 1 Selasa 1 Des ⚔️',
+  '@{u} barisan kita nambah satu lagi nih 😄',
+  '@{u} haha sabar ya, perangnya Selasa',
+  '@{u} sip 🙌 jangan lupa mantengin hari Selasa',
+];
+const T_WHEN = [        // "kapan perangnya?"
+  '@{u} Selasa, 1 Desember ya 🗓️ jangan sampai kelewat',
+  '@{u} perang hari 1 jatuhnya Selasa 1 Des ⚔️',
+  '@{u} Selasa 1 Des! follow dulu biar nggak ketinggalan',
+  '@{u} hari Selasa, 1 Desember. catat tanggalnya 📅',
+  '@{u} Selasa 1 Desember ya {e}',
+];
+const T_UNDEAD = [      // komentar soal undead / skeleton / musuh
+  '@{u} iya, undead-nya udah kelihatan di perbatasan 😬',
+  '@{u} serem ya pasukannya 💀 makanya Selasa kita butuh semua warga',
+  '@{u} mereka udah nunggu di balik hutan 👀',
+  '@{u} nah itu dia, Selasa baru ketahuan hasilnya 💀',
+  '@{u} jangan takut, kita kan rame-rame 😤',
+];
+const T_NAGA = [        // ibu naga / necromancer / portal: jangan bocorin plot, cukup yang sudah tayang
+  '@{u} yang jelas ibu naga masih dirantai 🐉 sisanya kita lihat nanti ya',
+  '@{u} kamu juga kepikiran soal ceritanya ya 👀',
+  '@{u} sabar, ceritanya masih jalan 🐉 pantengin terus',
+  '@{u} teorinya menarik 👀 simpan dulu, nanti kita lihat',
+  '@{u} soal itu saya belum bisa bilang apa-apa dulu 🤫',
+];
+const T_TAG = [         // "namaku mana?", nama di atas kepala prajurit
+  '@{u} coba pause, nama warga ada di atas kepala prajuritnya 👀',
+  '@{u} cari pelan-pelan ya, siapa tau namamu ada 😄',
+  '@{u} kalau udah follow, coba cek di atas kepala prajurit 👀',
+  '@{u} nama kamu kebaca nggak? coba pause pas pasukannya kelihatan',
+];
+const WAR_CTAS = [
+  ' Perang Selasa 1 Des, pastiin udah follow ya ⚔️',
+  ' Kalau belum follow, follow dulu biar bisa ikut perang Selasa',
+  ' Selasa kita perang, jangan sampai ketinggalan 🔥',
+  ' Oh ya, Selasa 1 Des. follow biar kebagian perang 🛡️',
+  ' Kita perang hari Selasa lho, ajak temanmu follow juga',
+];
+const JOB_CTAS_SMALL = [
+  ' Sekalian komen jobmu kalau mau: KNIGHT, MAGE, atau RANGER',
+  ' Kalau mau, pilih job juga: KNIGHT / MAGE / RANGER',
+];
 const T_KELUAR = [
   '@{u} oke, dicatat ya. makasih udah mampir 🙏',
   '@{u} siap. kapan-kapan main lagi ya 👋',
@@ -188,7 +241,7 @@ function pickReply(c, ctx = {}) {
   const own = (text.match(/\p{Extended_Pictographic}/u) || [])[0];       // emoji yang dipakai si pengomentar
   const items = text.split(/,|\bsama\b|\bdan\b|\bserta\b/i).filter(x => x.trim().length > 2).length;
   const buildable = /rumah sakit|rumah ibadah/i.test(text) ? null : parseBuild(text);  // "rumah sakit" bukan "rumah"
-  const vote = detectVote(text);
+  const vote = process.env.VOTE_ACTIVE === '1' ? detectVote(text) : null;   // Day 8 tidak ada A/B
   if (vote) return humanize(pick(vote === 'A' ? T_VOTE_A : T_VOTE_B, h).replace('{u}', c.username), h);
   const job = detectJob(text);
   if (job) {
@@ -198,15 +251,24 @@ function pickReply(c, ctx = {}) {
     return pick(T_JOB[job], h).replace('{u}', c.username);
   }
   if (/\bkeluar\b/i.test(text)) list = T_KELUAR;
-  else if (/(ga|gak|nggak|tidak|ngga|belum)\s*(di)?(anggap|notice|bales|balas|respon)|dicuekin|diabaikan|cuek/i.test(text)) list = done ? T_SORRY_DONE : T_SORRY;
+  else if (/(ga|gak|nggak|tidak|ngga|belum)\s*(di\s*)?(anggap|notice|bales|balas|respon)|dicuekin|diabaikan|cuek/i.test(text)) list = done ? T_SORRY_DONE : T_SORRY;
   else if (items >= 3) list = T_MULTI;
   else if (buildable) { list = T_BUILD; b = NAMA[buildable] || buildable; e = pick(EMO_BUILD[buildable] || GENERIC_EMO, h >>> 3); }
+  else if (/kapan.*(perang|war|mulai)|(perang|war).*kapan|tanggal berapa|hari apa/i.test(text)) { list = T_WHEN; e = pick(['⚔️', '🔥', '📅'], h >>> 3); }
+  else if (/nama(ku|mu|\s*(saya|aku))?\b.*(mana|ada|muncul|kebaca|ketemu)|ketemu nama|(atas kepala|\btag\b).*nama|nama.*(atas kepala|\btag\b)/i.test(text)) list = T_TAG;
+  else if (/ibu naga|necro|portal|\bnaga\b|rantai/i.test(text)) list = T_NAGA;
+  else if (/undead|skeleton|kerangka|zombie|musuh/i.test(text)) list = T_UNDEAD;
+  else if (/perang|\bwar\b|\bsiap\b|gaskeun|\bgas+\b|\bikut\b|lawan|maju/i.test(text) && !/\b(bangun|bikin|buatin|tambah)/i.test(text)) list = T_WAR;
   else if (/\b(bangun|bikin|buat|buatin|dong|minta|tambah)/i.test(text)) { list = T_NOBUILD; e = emojiFor(text, h >>> 3); }
   else { list = done ? T_WELCOME_DONE : T_WELCOME; e = own || pick(['🙌', '😊', '🎉'], h >>> 3); }
   let out = pick(list, h).replace('{u}', c.username).replace('{b}', b).replace('{e}', e);
   // Day 4: balasan ajak pilih job, dengan kalimat yang berganti-ganti (dan sesekali dilewati supaya tidak terasa template)
-  const wantsCta = !done && [T_BUILD, T_NOBUILD, T_MULTI, T_WELCOME, T_SORRY].includes(list) && !/KNIGHT|MAGE|RANGER/.test(out);
-  if (wantsCta && (h >>> 5) % 6 !== 0) out += (/[.!?\p{Extended_Pictographic}]\uFE0F?$/u.test(out) ? '' : '.') + pick(JOB_CTAS, h >>> 7);
+  // Day 8: CTA utama = follow biar ikut perang Selasa. Ajakan pilih job hanya sesekali dan kecil. Sesekali dilewati supaya tidak terasa template.
+  const wantsCta = [T_BUILD, T_NOBUILD, T_MULTI, T_WELCOME, T_SORRY, T_TAG, T_NAGA, T_UNDEAD].includes(list) && !/KNIGHT|MAGE|RANGER|Selasa/.test(out);
+  if (wantsCta && (h >>> 5) % 4 !== 0) {
+    const jobSmall = !done && (h >>> 9) % 4 === 0;
+    out += (/[.!?\p{Extended_Pictographic}]\uFE0F?$/u.test(out) ? '' : '.') + pick(jobSmall ? JOB_CTAS_SMALL : WAR_CTAS, h >>> 7);
+  }
   return humanize(out, h);
 }
 
